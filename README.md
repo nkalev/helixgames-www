@@ -26,6 +26,16 @@ Space invaders style arcade shooter. Defend Earth from waves of alien attackers!
 - Arrow keys: Move
 - Spacebar: Fire
 
+### [Tetris](tetris/index.html)
+The legendary block-stacking puzzle game. Arrange falling tetrominoes to clear lines and score points!
+
+**Controls:**
+- Arrow keys ← →: Move piece
+- Arrow key ↓: Soft drop
+- Arrow key ↑ / Spacebar: Rotate
+- P: Pause
+- R: Restart (when game over)
+
 ## 🚀 Quick Start
 
 This is a static HTML/JavaScript website. Simply serve the directory with any web server.

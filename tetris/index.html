@@ -11,11 +11,11 @@
   gtag('config', 'G-DJTE7HLB8V');
 </script>
   <meta charset="utf-8" />
-  <title>Alien Invasion</title>
+  <title>Tetris - Classic Puzzle Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Play Alien Invasion - Classic space invaders style game. Defend Earth from waves of alien attackers in this retro arcade shooter. Free online game." />
+  <meta name="description" content="Play Classic Tetris - The legendary block-stacking puzzle game. Arrange falling tetrominoes to clear lines and score points. Free browser-based game." />
   <meta name="author" content="Helix Games" />
-  <meta name="keywords" content="alien invasion, space invaders, arcade shooter, retro game, classic arcade, browser game" />
+  <meta name="keywords" content="tetris, puzzle game, block game, classic tetris, retro gaming, browser game, falling blocks" />
   <link href="../assets/css/vendor.min.css" rel="stylesheet" />
   <link href="../assets/css/app.min.css" rel="stylesheet" />
   <link href="../assets/plugins/kbw-countdown/dist/css/jquery.countdown.css" rel="stylesheet" />
@@ -85,13 +85,13 @@
 						</a>
 					</div>
 					<div class="menu-item">
-						<a href="index.html" class="menu-link">
+						<a href="../invasion/index.html" class="menu-link">
 							<span class="menu-icon"><i class="bi bi-controller"></i></span>
 							<span class="menu-text">Invasion</span>
 						</a>
 					</div>
 					<div class="menu-item">
-						<a href="../tetris/index.html" class="menu-link">
+						<a href="index.html" class="menu-link">
 							<span class="menu-icon"><i class="bi bi-controller"></i></span>
 							<span class="menu-text">Tetris</span>
 						</a>
@@ -109,34 +109,76 @@
 		
 		<!-- BEGIN #content -->
 		<div id="content" class="app-content">
-			  <div id='container'>
-			  	<h1 class="game-title">Alien Invasion</h1>
-			  	
-			  	<!-- Game Controls Guide -->
-			  	<div class="game-controls">
-			  	  <h3>🎮 Controls</h3>
-			  	  <div class="control-grid">
-			  	    <div class="control-item">
-			  	      <span class="control-key">← →</span>
-			  	      <span class="control-desc">Move ship</span>
-			  	    </div>
-			  	    <div class="control-item">
-			  	      <span class="control-key">SPACE</span>
-			  	      <span class="control-desc">Fire missiles</span>
-			  	    </div>
-			  	  </div>
-			  	</div>
-			  	
-			        <canvas id='game' width='453' height='679'></canvas>
-			        
-			        <div class="game-instructions">
-			          <p><strong>Objective:</strong> Defend Earth from waves of alien invaders!</p>
-			          <p><strong>Tip:</strong> Different enemy types have different attack patterns. Watch out for missiles!</p>
-			          <p><strong>How to play:</strong> Press SPACE to start, then use arrow keys to move and SPACE to shoot.</p>
-			        </div>
-			  </div>
-			  <script src='engine.js'></script>
-			  <script src='game.js'></script>
+			<div id="game-container">
+				<h1 class="game-title">Tetris</h1>
+				
+				<div class="game-layout">
+					<!-- Main game canvas -->
+					<div>
+						<canvas id="tetris-canvas"></canvas>
+					</div>
+					
+					<!-- Side panel -->
+					<div class="side-panel">
+						<!-- Stats -->
+						<div class="stats-panel">
+							<h3>📊 Stats</h3>
+							<div class="stat-item">
+								<span class="stat-label">Score</span>
+								<span class="stat-value" id="score">0</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-label">Lines</span>
+								<span class="stat-value" id="lines">0</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-label">Level</span>
+								<span class="stat-value" id="level">1</span>
+							</div>
+						</div>
+						
+						<!-- Next piece -->
+						<div class="next-panel">
+							<h3>Next Piece</h3>
+							<canvas id="next-piece" width="120" height="120"></canvas>
+						</div>
+					</div>
+				</div>
+				
+				<!-- Controls -->
+				<div class="controls-panel">
+					<h3>🎮 Controls</h3>
+					<div class="controls-grid">
+						<div class="control-item">
+							<span class="control-key">← →</span>
+							<span class="control-desc">Move left/right</span>
+						</div>
+						<div class="control-item">
+							<span class="control-key">↓</span>
+							<span class="control-desc">Soft drop</span>
+						</div>
+						<div class="control-item">
+							<span class="control-key">↑ / SPACE</span>
+							<span class="control-desc">Rotate</span>
+						</div>
+						<div class="control-item">
+							<span class="control-key">P</span>
+							<span class="control-desc">Pause</span>
+						</div>
+						<div class="control-item">
+							<span class="control-key">R</span>
+							<span class="control-desc">Restart (game over)</span>
+						</div>
+					</div>
+				</div>
+				
+				<!-- Instructions -->
+				<div class="game-instructions">
+					<p><strong>How to Play:</strong> Arrange falling blocks (tetrominoes) to create complete horizontal lines. When a line is completed, it disappears and you earn points!</p>
+					<p><strong>Scoring:</strong> Clear multiple lines at once for bonus points. The game speeds up as you advance through levels.</p>
+					<p><strong>Strategy:</strong> Plan ahead using the "Next Piece" preview. Try to keep your stack low and avoid creating gaps!</p>
+				</div>
+			</div>
 		</div>
 		<!-- END #content -->
 		
@@ -147,9 +189,12 @@
 	<!-- END #app -->
 	
 	<!-- ================== BEGIN core-js ================== -->
-	<script src="assets/js/vendor.min.js"></script>
-	<script src="assets/js/app.min.js"></script>
+	<script src="../assets/js/vendor.min.js"></script>
+	<script src="../assets/js/app.min.js"></script>
 	<!-- ================== END core-js ================== -->
+	
+	<!-- Game JS -->
+	<script src="game.js"></script>
 	
 </body>
 </html>
