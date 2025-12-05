@@ -18,37 +18,28 @@
   padding: 20px;
 }
 
-/* Canvas styling */
+/* Canvas styling - MINIMAL to prevent performance issues */
 #canvas {
-  background: var(--helix-bg-dark);
-  border: 3px solid var(--helix-primary);
-  border-radius: 12px;
-  box-shadow: 
-    0 0 20px rgba(60, 210, 165, 0.3),
-    0 0 40px rgba(60, 210, 165, 0.2),
-    inset 0 0 60px rgba(60, 210, 165, 0.05);
+  background: #000000;
+  border: 2px solid #3cd2a5;
   display: inline-block;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
-  /* Note: CSS filters removed - they cause performance issues on animated canvas */
+  /* ALL SHADOWS, EFFECTS, AND DECORATIONS REMOVED - they cause freezing on animated canvas */
 }
 
 /* Hover effect removed - can interfere with game performance */
 
-/* Game title */
+/* Game title - simplified */
 .game-title {
   color: var(--helix-primary);
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 20px;
-  text-shadow: 
-    0 0 10px rgba(60, 210, 165, 0.5),
-    0 0 20px rgba(60, 210, 165, 0.3);
+  /* Text-shadow removed - can cause performance issues */
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-/* Game info panel */
+/* Game info panel - simplified */
 .game-info {
   display: flex;
   justify-content: space-around;
@@ -57,7 +48,7 @@
   padding: 20px;
   background: var(--helix-bg-card);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  /* Box-shadow removed */
 }
 
 .info-item {
@@ -79,7 +70,7 @@
   font-size: 2rem;
   color: var(--helix-primary);
   font-weight: 700;
-  text-shadow: 0 2px 8px rgba(60, 210, 165, 0.3);
+  /* Text-shadow removed */
 }
 
 /* Controls section */
@@ -114,14 +105,10 @@
   background: rgba(60, 210, 165, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(60, 210, 165, 0.15);
-  transition: all 0.2s ease;
+  /* Transition removed - can cause performance issues */
 }
 
-.control-item:hover {
-  background: rgba(60, 210, 165, 0.1);
-  border-color: rgba(60, 210, 165, 0.3);
-  transform: translateX(5px);
-}
+/* Hover effect removed to prevent performance issues */
 
 .control-key {
   background: var(--helix-primary);
@@ -132,7 +119,7 @@
   font-size: 0.875rem;
   min-width: 80px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(60, 210, 165, 0.3);
+  /* Box-shadow removed */
 }
 
 .control-desc {
@@ -141,7 +128,7 @@
   flex: 1;
 }
 
-/* Start button */
+/* Start button - simplified to prevent performance issues */
 .start-button {
   background: var(--helix-primary);
   color: #0a0e10;
@@ -153,26 +140,8 @@
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: all 0.3s ease;
-  box-shadow: 
-    0 4px 15px rgba(60, 210, 165, 0.4),
-    0 0 20px rgba(60, 210, 165, 0.2);
   margin: 20px 0;
-}
-
-.start-button:hover {
-  background: var(--helix-primary-light);
-  transform: translateY(-3px);
-  box-shadow: 
-    0 6px 20px rgba(60, 210, 165, 0.6),
-    0 0 30px rgba(60, 210, 165, 0.3);
-}
-
-.start-button:active {
-  transform: translateY(-1px);
-  box-shadow: 
-    0 3px 10px rgba(60, 210, 165, 0.4),
-    0 0 15px rgba(60, 210, 165, 0.2);
+  /* All transitions, transforms, and shadows removed */
 }
 
 /* Instructions */
