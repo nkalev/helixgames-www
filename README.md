@@ -37,6 +37,20 @@ The legendary block-stacking puzzle game. Arrange falling tetrominoes to clear l
 - P: Pause
 - R: Restart (when game over)
 
+### [Pac-Man](pacman/index.html)
+The classic maze arcade game! Navigate mazes, eat pellets, avoid ghosts, and use power pellets to turn the tables!
+
+**Controls:**
+- Arrow keys: Move Pac-Man up/down/left/right
+- R: Restart (after game over)
+
+**Features:**
+- Classic maze design with tunnels
+- 4 ghosts with unique behaviors
+- Power pellets to eat ghosts
+- Progressive difficulty
+- Lives system
+
 ## 🚀 Quick Start
 
 This is a static HTML/JavaScript website. Simply serve the directory with any web server.

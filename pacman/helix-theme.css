@@ -1,0 +1,247 @@
+/* Helix Games Theme for Pac-Man */
+/* Performance-first: Minimal canvas styling, polish on UI */
+
+:root {
+  --helix-primary: #3cd2a5;
+  --helix-primary-light: #5ddbb5;
+  --helix-primary-dark: #2ab88c;
+  --helix-bg-dark: #0a0e10;
+  --helix-bg-card: #1a1f23;
+  --helix-text: #ffffff;
+  --helix-text-muted: rgba(255, 255, 255, 0.6);
+}
+
+/* Game container */
+#game-container {
+  text-align: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Game title */
+.game-title {
+  color: var(--helix-primary);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(60, 210, 165, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Game layout */
+.game-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  margin: 20px auto;
+  flex-wrap: wrap;
+}
+
+/* Canvas - MINIMAL styling for 60fps */
+#pacman-canvas {
+  background: #000000;
+  border: 3px solid var(--helix-primary);
+  display: block;
+  /* No shadows, filters, or effects - keeps performance optimal */
+}
+
+/* Stats panel */
+.stats-panel {
+  background: var(--helix-bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(60, 210, 165, 0.2);
+  padding: 20px;
+  min-width: 200px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stats-panel h3 {
+  color: var(--helix-primary);
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: rgba(60, 210, 165, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(60, 210, 165, 0.15);
+}
+
+.stat-label {
+  color: var(--helix-text-muted);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  color: var(--helix-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(60, 210, 165, 0.3);
+}
+
+/* Controls panel */
+.controls-panel {
+  background: var(--helix-bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(60, 210, 165, 0.2);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 700px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.controls-panel h3 {
+  color: var(--helix-primary);
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(60, 210, 165, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(60, 210, 165, 0.15);
+}
+
+.control-key {
+  background: var(--helix-primary);
+  color: #0a0e10;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  min-width: 60px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(60, 210, 165, 0.3);
+  white-space: nowrap;
+}
+
+.control-desc {
+  color: var(--helix-text);
+  font-size: 0.875rem;
+}
+
+/* Instructions */
+.game-instructions {
+  color: var(--helix-text-muted);
+  font-size: 0.875rem;
+  margin-top: 20px;
+  line-height: 1.6;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.game-instructions strong {
+  color: var(--helix-primary);
+  font-weight: 600;
+}
+
+/* Game info */
+.game-info {
+  background: var(--helix-bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(60, 210, 165, 0.2);
+  padding: 15px;
+  margin: 20px auto;
+  max-width: 700px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.game-info h4 {
+  color: var(--helix-primary);
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.game-info p {
+  color: var(--helix-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 5px 0;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-text {
+  color: var(--helix-text);
+  font-size: 0.875rem;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .game-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #pacman-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .game-title {
+    font-size: 2rem;
+  }
+  
+  .stats-panel {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .game-title {
+    font-size: 1.5rem;
+  }
+  
+  .stats-panel {
+    min-width: auto;
+  }
+}
