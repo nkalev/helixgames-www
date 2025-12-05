@@ -19,6 +19,7 @@
   <link href="../assets/css/vendor.min.css" rel="stylesheet" />
   <link href="../assets/css/app.min.css" rel="stylesheet" />
   <link href="../assets/plugins/kbw-countdown/dist/css/jquery.countdown.css" rel="stylesheet" />
+  <link href="helix-theme.css" rel="stylesheet" />
 </head>
 <body>
 	<!-- BEGIN #app -->
@@ -103,9 +104,30 @@
 		<!-- BEGIN #content -->
 		<div id="content" class="app-content">
 			  <div id='container'>
-				<br>
-        			<br>
-			        <div class="text-center"><canvas id='game' width='453' height='679'></canvas></div>
+			  	<h1 class="game-title">Alien Invasion</h1>
+			  	
+			  	<!-- Game Controls Guide -->
+			  	<div class="game-controls">
+			  	  <h3>🎮 Controls</h3>
+			  	  <div class="control-grid">
+			  	    <div class="control-item">
+			  	      <span class="control-key">← →</span>
+			  	      <span class="control-desc">Move ship</span>
+			  	    </div>
+			  	    <div class="control-item">
+			  	      <span class="control-key">SPACE</span>
+			  	      <span class="control-desc">Fire missiles</span>
+			  	    </div>
+			  	  </div>
+			  	</div>
+			  	
+			        <canvas id='game' width='453' height='679'></canvas>
+			        
+			        <div class="game-instructions">
+			          <p><strong>Objective:</strong> Defend Earth from waves of alien invaders!</p>
+			          <p><strong>Tip:</strong> Different enemy types have different attack patterns. Watch out for missiles!</p>
+			          <p><strong>How to play:</strong> Press SPACE to start, then use arrow keys to move and SPACE to shoot.</p>
+			        </div>
 			  </div>
 			  <script src='engine.js'></script>
 			  <script src='game.js'></script>

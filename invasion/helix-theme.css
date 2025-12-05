@@ -1,0 +1,122 @@
+/* Helix Games Theme for Invasion */
+/* Lessons learned: Keep canvas minimal, polish UI only */
+
+:root {
+  --helix-primary: #3cd2a5;
+  --helix-primary-light: #5ddbb5;
+  --helix-primary-dark: #2ab88c;
+  --helix-bg-dark: #0a0e10;
+  --helix-bg-card: #1a1f23;
+  --helix-text: #ffffff;
+  --helix-text-muted: rgba(255, 255, 255, 0.6);
+}
+
+/* Game container */
+#container {
+  text-align: center;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Canvas - MINIMAL styling to prevent performance issues */
+#game {
+  background: #000000;
+  border: 3px solid var(--helix-primary);
+  display: block;
+  margin: 20px auto;
+  /* No shadows, filters, or effects on canvas - keeps 60fps */
+}
+
+/* Game title */
+.game-title {
+  color: var(--helix-primary);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(60, 210, 165, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Controls panel */
+.game-controls {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  background: var(--helix-bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(60, 210, 165, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.game-controls h3 {
+  color: var(--helix-primary);
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: rgba(60, 210, 165, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(60, 210, 165, 0.15);
+}
+
+.control-key {
+  background: var(--helix-primary);
+  color: #0a0e10;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  min-width: 80px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(60, 210, 165, 0.3);
+}
+
+.control-desc {
+  color: var(--helix-text);
+  font-size: 0.875rem;
+  flex: 1;
+}
+
+/* Instructions */
+.game-instructions {
+  color: var(--helix-text-muted);
+  font-size: 0.875rem;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+.game-instructions strong {
+  color: var(--helix-primary);
+  font-weight: 600;
+}
+
+/* Responsive design */
+@media screen and (max-width: 520px) {
+  #game {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .game-title {
+    font-size: 2rem;
+  }
+  
+  .control-grid {
+    grid-template-columns: 1fr;
+  }
+}
