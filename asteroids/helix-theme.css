@@ -21,25 +21,26 @@
 /* Canvas styling - MINIMAL to prevent performance issues */
 #canvas {
   background: #000000;
-  border: 2px solid #3cd2a5;
+  border: 3px solid #3cd2a5;
   display: inline-block;
-  /* ALL SHADOWS, EFFECTS, AND DECORATIONS REMOVED - they cause freezing on animated canvas */
+  /* Keep canvas effects minimal - it redraws 60 times per second */
+  /* No box-shadow, filters, or animations on canvas itself */
 }
 
 /* Hover effect removed - can interfere with game performance */
 
-/* Game title - simplified */
+/* Game title - with text glow */
 .game-title {
   color: var(--helix-primary);
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 20px;
-  /* Text-shadow removed - can cause performance issues */
+  text-shadow: 0 0 10px rgba(60, 210, 165, 0.5);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-/* Game info panel - simplified */
+/* Game info panel - with shadow */
 .game-info {
   display: flex;
   justify-content: space-around;
@@ -48,7 +49,7 @@
   padding: 20px;
   background: var(--helix-bg-card);
   border-radius: 12px;
-  /* Box-shadow removed */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .info-item {
@@ -70,7 +71,7 @@
   font-size: 2rem;
   color: var(--helix-primary);
   font-weight: 700;
-  /* Text-shadow removed */
+  text-shadow: 0 2px 8px rgba(60, 210, 165, 0.3);
 }
 
 /* Controls section */
@@ -119,7 +120,7 @@
   font-size: 0.875rem;
   min-width: 80px;
   text-align: center;
-  /* Box-shadow removed */
+  box-shadow: 0 2px 8px rgba(60, 210, 165, 0.3);
 }
 
 .control-desc {
@@ -128,7 +129,7 @@
   flex: 1;
 }
 
-/* Start button - simplified to prevent performance issues */
+/* Start button - with hover effects */
 .start-button {
   background: var(--helix-primary);
   color: #0a0e10;
@@ -141,7 +142,14 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 20px 0;
-  /* All transitions, transforms, and shadows removed */
+  box-shadow: 0 4px 15px rgba(60, 210, 165, 0.4);
+  transition: all 0.3s ease;
+}
+
+.start-button:hover {
+  background: var(--helix-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(60, 210, 165, 0.6);
 }
 
 /* Instructions */
