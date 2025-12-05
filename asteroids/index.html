@@ -19,14 +19,15 @@
     <link href="../assets/css/vendor.min.css" rel="stylesheet" />
     <link href="../assets/css/app.min.css" rel="stylesheet" />
     <link href="../assets/plugins/kbw-countdown/dist/css/jquery.countdown.css" rel="stylesheet" />
+    <link href="helix-theme.css" rel="stylesheet" />
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="vector_battle_regular.typeface.js"></script>
     <script src="ipad.js"></script>
     <script src="game.js"></script>
+    <script src="helix-enhancements.js"></script>
     <style>
-      #canvas { border:1px solid black; top:0px; left:0px; }
-      .button { position:absolute; border:1px solid black; }
+      .button { position:absolute; border:1px solid #3cd2a5; background: rgba(60, 210, 165, 0.2); color: #fff; }
       #left-controls { position:absolute; left:1px; bottom:0px; display:none; }
       #right-controls { position:absolute; right:1px; bottom:0px; display:none; }
       #up { width:200px; height:100px; bottom:100px;}
@@ -118,15 +119,56 @@
 		<!-- BEGIN #content -->
 		<div id="content" class="app-content">
 		    <div id="game-container">
-      			<br><br>
-      			<div class="text-center"><canvas id="canvas" width="780" height="540"></canvas></div>
-      			   <div id="left-controls">
+      			<h1 class="game-title">Asteroids</h1>
+      			
+      			<!-- Game Controls Guide -->
+      			<div class="game-controls">
+      			  <h3>🎮 Controls</h3>
+      			  <div class="control-grid">
+      			    <div class="control-item">
+      			      <span class="control-key">← →</span>
+      			      <span class="control-desc">Rotate ship</span>
+      			    </div>
+      			    <div class="control-item">
+      			      <span class="control-key">↑</span>
+      			      <span class="control-desc">Thrust forward</span>
+      			    </div>
+      			    <div class="control-item">
+      			      <span class="control-key">SPACE</span>
+      			      <span class="control-desc">Fire weapon</span>
+      			    </div>
+      			    <div class="control-item">
+      			      <span class="control-key">P</span>
+      			      <span class="control-desc">Pause game</span>
+      			    </div>
+      			    <div class="control-item">
+      			      <span class="control-key">M</span>
+      			      <span class="control-desc">Mute sound</span>
+      			    </div>
+      			    <div class="control-item">
+      			      <span class="control-key">F</span>
+      			      <span class="control-desc">Show FPS</span>
+      			    </div>
+      			  </div>
+      			</div>
+      			
+      			<div class="text-center">
+      			  <canvas id="canvas" width="780" height="540"></canvas>
+      			</div>
+      			
+      			<div class="game-instructions">
+      			  <p><strong>Objective:</strong> Destroy all asteroids and enemy ships while surviving as long as possible!</p>
+      			  <p><strong>Tip:</strong> Use momentum and inertia to your advantage. Watch out for UFOs!</p>
+      			</div>
+      			
+      			<!-- Mobile touch controls -->
+      			<div id="left-controls">
         			<div id="up" class='button'>THRUST</div>
         			<div id="left" class='button'>LEFT</div>
         			<div id="right" class='button'>RIGHT</div>
-      			   </div>
+      			</div>
       			<div id="right-controls">
-        		<div id="space" class='button'>FIRE</div>
+        			<div id="space" class='button'>FIRE</div>
       			</div>
     		    </div>
 		</div>
