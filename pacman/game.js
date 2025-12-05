@@ -93,34 +93,15 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Check collision with character radius (not just center point)
-    const radius = TILE_SIZE / 2 - 2;
+    // Simple center-point collision check
+    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
     
-    // Check all four corners of the bounding box
-    const points = [
-      { px: x - radius, py: y - radius }, // top-left
-      { px: x + radius, py: y - radius }, // top-right
-      { px: x - radius, py: y + radius }, // bottom-left
-      { px: x + radius, py: y + radius }  // bottom-right
-    ];
-    
-    for (let point of points) {
-      const gridX = Math.floor((point.px - TILE_SIZE / 2) / TILE_SIZE);
-      const gridY = Math.floor((point.py - TILE_SIZE / 2) / TILE_SIZE);
-      
-      // Allow tunnel on middle row
-      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-        if (gridY !== 14) return false;
-        continue;
-      }
-      
-      // If any corner hits a wall, can't move
-      if (maze[gridY][gridX] === 1) {
-        return false;
-      }
+    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+      return gridY === 14; // Allow tunnel
     }
     
-    return true;
+    return maze[gridY][gridX] !== 1;
   }
   
   getTilePos() {
@@ -226,34 +207,15 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Check collision with character radius (not just center point)
-    const radius = TILE_SIZE / 2 - 2;
+    // Simple center-point collision check
+    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
     
-    // Check all four corners of the bounding box
-    const points = [
-      { px: x - radius, py: y - radius }, // top-left
-      { px: x + radius, py: y - radius }, // top-right
-      { px: x - radius, py: y + radius }, // bottom-left
-      { px: x + radius, py: y + radius }  // bottom-right
-    ];
-    
-    for (let point of points) {
-      const gridX = Math.floor((point.px - TILE_SIZE / 2) / TILE_SIZE);
-      const gridY = Math.floor((point.py - TILE_SIZE / 2) / TILE_SIZE);
-      
-      // Allow tunnel on middle row
-      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-        if (gridY !== 14) return false;
-        continue;
-      }
-      
-      // If any corner hits a wall, can't move
-      if (maze[gridY][gridX] === 1) {
-        return false;
-      }
+    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+      return gridY === 14;
     }
     
-    return true;
+    return maze[gridY][gridX] !== 1;
   }
   
   getTilePos() {
