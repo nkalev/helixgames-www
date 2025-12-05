@@ -30,17 +30,10 @@
   display: inline-block;
   image-rendering: crisp-edges;
   image-rendering: pixelated;
-  transition: box-shadow 0.3s ease;
-  /* Apply cyan color tint to game graphics */
-  filter: brightness(1.1) contrast(1.1) saturate(1.2) hue-rotate(140deg);
+  /* Note: CSS filters removed - they cause performance issues on animated canvas */
 }
 
-#canvas:hover {
-  box-shadow: 
-    0 0 30px rgba(60, 210, 165, 0.5),
-    0 0 60px rgba(60, 210, 165, 0.3),
-    inset 0 0 80px rgba(60, 210, 165, 0.08);
-}
+/* Hover effect removed - can interfere with game performance */
 
 /* Game title */
 .game-title {
@@ -220,23 +213,7 @@
   }
 }
 
-/* Animation for game start */
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 
-      0 0 20px rgba(60, 210, 165, 0.3),
-      0 0 40px rgba(60, 210, 165, 0.2);
-  }
-  50% {
-    box-shadow: 
-      0 0 30px rgba(60, 210, 165, 0.5),
-      0 0 60px rgba(60, 210, 165, 0.3);
-  }
-}
-
-.game-active #canvas {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
+/* Animation removed - can cause performance issues during gameplay */
 
 /* Status indicator */
 .game-status {
