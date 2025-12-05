@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DJTE7HLB8V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DJTE7HLB8V');
+</script>
+    <meta charset="utf-8" />
+    <title>Asteroids</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link href="../assets/css/vendor.min.css" rel="stylesheet" />
+    <link href="../assets/css/app.min.css" rel="stylesheet" />
+    <link href="../assets/plugins/kbw-countdown/dist/css/jquery.countdown.css" rel="stylesheet" />
+
+    <script src="jquery-1.4.1.min.js"></script>
+    <script src="vector_battle_regular.typeface.js"></script>
+    <script src="ipad.js"></script>
+    <script src="game.js"></script>
+    <style>
+      #canvas { border:1px solid black; top:0px; left:0px; }
+      .button { position:absolute; border:1px solid black; }
+      #left-controls { position:absolute; left:1px; bottom:0px; display:none; }
+      #right-controls { position:absolute; right:1px; bottom:0px; display:none; }
+      #up { width:200px; height:100px; bottom:100px;}
+      #left { width:100px; height:100px; bottom:0px;}
+      #right { width:100px; height:100px; bottom:0px; left:100px; }
+      #space { width:200px; height:200px; bottom:0px; right:0px; }
+    </style>
+</head>
+<body>
+	<!-- BEGIN #app -->
+	<div id="app" class="app">
+		<!-- BEGIN #header -->
+		<div id="header" class="app-header">
+			<!-- BEGIN desktop-toggler -->
+			<div class="desktop-toggler">
+				<button type="button" class="menu-toggler" data-toggle-class="app-sidebar-collapsed" data-dismiss-class="app-sidebar-toggled" data-toggle-target=".app">
+					<span class="bar"></span>
+					<span class="bar"></span>
+					<span class="bar"></span>
+				</button>
+			</div>
+			<!-- BEGIN desktop-toggler -->
+			
+			<!-- BEGIN mobile-toggler -->
+			<div class="mobile-toggler">
+				<button type="button" class="menu-toggler" data-toggle-class="app-sidebar-mobile-toggled" data-toggle-target=".app">
+					<span class="bar"></span>
+					<span class="bar"></span>
+					<span class="bar"></span>
+				</button>
+			</div>
+			<!-- END mobile-toggler -->
+			
+			<!-- BEGIN brand -->
+			<div class="brand">
+				<a href="../index.html" class="brand-logo">
+					<span class="brand-img">
+						<span class="brand-img-text text-theme">H</span>
+					</span>
+					<span class="brand-text">Helix Games</span>
+				</a>
+			</div>
+			<!-- END brand -->
+			
+			<!-- BEGIN menu -->
+			<div class="menu">
+			</div>
+			<!-- END menu -->
+			
+		</div>
+		<!-- END #header -->
+		
+		<!-- BEGIN #sidebar -->
+		<div id="sidebar" class="app-sidebar">
+			<!-- BEGIN scrollbar -->
+			<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
+				<!-- BEGIN menu -->
+				<div class="menu">
+					<div class="menu-header">Games</div>
+					<div class="menu-item">
+						<a href="../2048/index.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-controller"></i></span>
+							<span class="menu-text">2048</span>
+						</a>
+					</div>
+					<div class="menu-item">
+						<a href="index.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-controller"></i></span>
+							<span class="menu-text">Asteroids</span>
+						</a>
+					</div>
+					<div class="menu-item">
+						<a href="../invasion/index.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-controller"></i></span>
+							<span class="menu-text">Invasion</span>
+						</a>
+					</div>
+				</div>
+				<!-- END menu -->
+			</div>
+			<!-- END scrollbar -->
+		</div>
+		<!-- END #sidebar -->
+			
+		<!-- BEGIN mobile-sidebar-backdrop -->
+		<button class="app-sidebar-mobile-backdrop" data-toggle-target=".app" data-toggle-class="app-sidebar-mobile-toggled"></button>
+		<!-- END mobile-sidebar-backdrop -->
+		
+		<!-- BEGIN #content -->
+		<div id="content" class="app-content">
+		    <div id="game-container">
+      			<br><br>
+      			<center><canvas id="canvas" width="780" height="540"></canvas></center>
+      			   <div id="left-controls">
+        			<div id="up" class='button'>THRUST</div>
+        			<div id="left" class='button'>LEFT</div>
+        			<div id="right" class='button'>RIGHT</div>
+      			   </div>
+      			<div id="right-controls">
+        		<div id="space" class='button'>FIRE</div>
+      			</div>
+    		    </div>
+		</div>
+		<!-- END #content -->
+		
+		<!-- BEGIN btn-scroll-top -->
+		<a href="#" data-toggle="scroll-to-top" class="btn-scroll-top fade"><i class="fa fa-arrow-up"></i></a>
+		<!-- END btn-scroll-top -->
+	</div>
+	<!-- END #app -->
+	
+	<!-- ================== BEGIN core-js ================== -->
+	<script src="assets/js/vendor.min.js"></script>
+	<script src="assets/js/app.min.js"></script>
+	<!-- ================== END core-js ================== -->
+	
+</body>
+</html>
