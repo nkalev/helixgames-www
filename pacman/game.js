@@ -93,16 +93,52 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Use Math.round to detect which tile the center is closest to
-    // This correctly handles transition to next tile for Right/Down movement
-    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Check the tile at the character's position
+    // For centered characters: position is at tile_center (tile * SIZE + SIZE/2)
+    // We need to check which tile(s) the character occupies
     
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14; // Allow tunnel
+    const buffer = 4; // Small buffer to prevent getting stuck in corners
+    
+    // Check the center point
+    const centerGridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
+    const centerGridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
+    
+    // Check if center is in tunnel
+    if (centerGridX < 0 || centerGridX >= MAZE_WIDTH || centerGridY < 0 || centerGridY >= MAZE_HEIGHT) {
+      return centerGridY === 14; // Allow tunnel
     }
     
-    return maze[gridY][gridX] !== 1;
+    // Check center tile
+    if (maze[centerGridY][centerGridX] === 1) {
+      return false;
+    }
+    
+    // Additionally, check the corners of a small bounding box around the center
+    // This prevents the character from clipping into walls
+    const checkPoints = [
+      { x: x - buffer, y: y - buffer }, // top-left
+      { x: x + buffer, y: y - buffer }, // top-right
+      { x: x - buffer, y: y + buffer }, // bottom-left
+      { x: x + buffer, y: y + buffer }  // bottom-right
+    ];
+    
+    for (let point of checkPoints) {
+      const px = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
+      const py = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
+      
+      // Skip out of bounds (tunnel area)
+      if (px < 0 || px >= MAZE_WIDTH || py < 0 || py >= MAZE_HEIGHT) {
+        if (py !== 14) return false; // Only allow tunnel on row 14
+        continue;
+      }
+      
+      // Check if this corner hits a wall
+      if (maze[py][px] === 1) {
+        return false;
+      }
+    }
+    
+    return true;
   }
   
   getTilePos() {
@@ -208,19 +244,45 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Use Math.round to detect which tile the center is closest to
-    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Same collision detection as PacMan for consistency
+    const buffer = 4;
     
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14;
+    const centerGridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
+    const centerGridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
+    
+    if (centerGridX < 0 || centerGridX >= MAZE_WIDTH || centerGridY < 0 || centerGridY >= MAZE_HEIGHT) {
+      return centerGridY === 14;
     }
     
-    return maze[gridY][gridX] !== 1;
+    if (maze[centerGridY][centerGridX] === 1) {
+      return false;
+    }
+    
+    const checkPoints = [
+      { x: x - buffer, y: y - buffer },
+      { x: x + buffer, y: y - buffer },
+      { x: x - buffer, y: y + buffer },
+      { x: x + buffer, y: y + buffer }
+    ];
+    
+    for (let point of checkPoints) {
+      const px = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
+      const py = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
+      
+      if (px < 0 || px >= MAZE_WIDTH || py < 0 || py >= MAZE_HEIGHT) {
+        if (py !== 14) return false;
+        continue;
+      }
+      
+      if (maze[py][px] === 1) {
+        return false;
+      }
+    }
+    
+    return true;
   }
   
   getTilePos() {
-    // Characters are centered at (tile * SIZE + SIZE/2), so subtract offset first
     return {
       x: Math.round((this.x - TILE_SIZE / 2) / TILE_SIZE),
       y: Math.round((this.y - TILE_SIZE / 2) / TILE_SIZE)
