@@ -93,9 +93,10 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Simple center-point collision check
-    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Use Math.round to detect which tile the center is closest to
+    // This correctly handles transition to next tile for Right/Down movement
+    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
     
     if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
       return gridY === 14; // Allow tunnel
@@ -107,8 +108,8 @@ class PacMan {
   getTilePos() {
     // Characters are centered at (tile * SIZE + SIZE/2), so subtract offset first
     return {
-      x: Math.floor((this.x - TILE_SIZE / 2) / TILE_SIZE),
-      y: Math.floor((this.y - TILE_SIZE / 2) / TILE_SIZE)
+      x: Math.round((this.x - TILE_SIZE / 2) / TILE_SIZE),
+      y: Math.round((this.y - TILE_SIZE / 2) / TILE_SIZE)
     };
   }
 }
@@ -207,9 +208,9 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Simple center-point collision check
-    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Use Math.round to detect which tile the center is closest to
+    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
     
     if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
       return gridY === 14;
@@ -221,8 +222,8 @@ class Ghost {
   getTilePos() {
     // Characters are centered at (tile * SIZE + SIZE/2), so subtract offset first
     return {
-      x: Math.floor((this.x - TILE_SIZE / 2) / TILE_SIZE),
-      y: Math.floor((this.y - TILE_SIZE / 2) / TILE_SIZE)
+      x: Math.round((this.x - TILE_SIZE / 2) / TILE_SIZE),
+      y: Math.round((this.y - TILE_SIZE / 2) / TILE_SIZE)
     };
   }
 }
