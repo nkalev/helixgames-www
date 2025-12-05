@@ -67,6 +67,9 @@ class Game {
       if (e.key === 'r' || e.key === 'R') {
         if (this.state === 'gameover') this.restart();
       }
+      if (e.key === 'm' || e.key === 'M') {
+        toggleMute();
+      }
       if (this.state === 'start' && (e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
         this.state = 'playing';
       }
@@ -167,6 +170,7 @@ class Game {
             height: 10,
             active: true
           });
+          audioManager.shoot(); // Sound effect
           // Reset space to require repress
           this.keys.space = false; 
         }
@@ -193,6 +197,7 @@ class Game {
           a.active = false; // Mark for removal
           this.score += a.score;
           this.createExplosion(a.x, a.y, '#3cd2a5');
+          audioManager.alienHit(); // Sound effect
           
           // Increase speed as aliens die
           this.alienMoveInterval = Math.max(5, this.alienMoveInterval * 0.98);
@@ -205,6 +210,7 @@ class Game {
         this.mysteryShip.active = false;
         this.score += Math.floor(Math.random() * 3 + 1) * 50; // 50, 100, 150
         this.createExplosion(this.mysteryShip.x, this.mysteryShip.y, '#ff0000');
+        audioManager.explosion(); // Sound effect
         this.mysteryShip = null;
         this.mysteryTimer = Math.random() * 1000 + 1000;
       }
@@ -246,6 +252,7 @@ class Game {
     // Level Complete
     if (this.aliens.length === 0) {
       this.level++;
+      audioManager.levelComplete(); // Sound effect
       this.initLevel();
       // Brief pause could be added here
     }
@@ -267,6 +274,7 @@ class Game {
       this.mysteryTimer--;
       if (this.mysteryTimer <= 0) {
         this.spawnMysteryShip();
+        audioManager.mysteryShip(); // Sound effect
       }
     } else {
       this.mysteryShip.x += this.mysteryShip.speed;
@@ -356,9 +364,11 @@ class Game {
     this.player.isDead = true;
     this.player.respawnTimer = 60;
     this.createExplosion(this.player.x, this.player.y, '#00ff00', 20);
+    audioManager.playerHit(); // Sound effect
     
     if (this.lives <= 0) {
       this.state = 'gameover';
+      audioManager.gameOver(); // Sound effect
     }
   }
   
@@ -513,3 +523,12 @@ class Game {
 window.addEventListener('DOMContentLoaded', () => {
   new Game();
 });
+
+// Mute toggle function
+function toggleMute() {
+  const muted = audioManager.toggleMute();
+  const btn = document.getElementById('muteToggle');
+  if (btn) {
+    btn.textContent = muted ? '🔇 Sound OFF' : '🔊 Sound ON';
+  }
+}

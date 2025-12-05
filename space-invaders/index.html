@@ -152,6 +152,12 @@
 						<span class="control-key">←</span> <span class="control-key">→</span> Move Ship
 						<span class="control-key">SPACE</span> Shoot
 						<span class="control-key">R</span> Restart
+						<span class="control-key">M</span> Mute/Unmute
+					</p>
+					<p style="margin-top: 10px;">
+						<button id="muteToggle" onclick="toggleMute()" style="background: var(--helix-primary); color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+							🔊 Sound ON
+						</button>
 					</p>
 				</div>
 			</div>
@@ -168,6 +174,9 @@
 	<script src="../assets/js/vendor.min.js"></script>
 	<script src="../assets/js/app.min.js"></script>
 	<!-- ================== END core-js ================== -->
+	
+	<!-- Audio System -->
+	<script src="audio.js"></script>
 	
 	<!-- Game JS -->
 	<script src="game.js"></script>
