@@ -93,15 +93,34 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Characters are centered at (tile * SIZE + SIZE/2), so subtract offset first
-    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Check collision with character radius (not just center point)
+    const radius = TILE_SIZE / 2 - 2;
     
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14; // Allow tunnel
+    // Check all four corners of the bounding box
+    const points = [
+      { px: x - radius, py: y - radius }, // top-left
+      { px: x + radius, py: y - radius }, // top-right
+      { px: x - radius, py: y + radius }, // bottom-left
+      { px: x + radius, py: y + radius }  // bottom-right
+    ];
+    
+    for (let point of points) {
+      const gridX = Math.floor((point.px - TILE_SIZE / 2) / TILE_SIZE);
+      const gridY = Math.floor((point.py - TILE_SIZE / 2) / TILE_SIZE);
+      
+      // Allow tunnel on middle row
+      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+        if (gridY !== 14) return false;
+        continue;
+      }
+      
+      // If any corner hits a wall, can't move
+      if (maze[gridY][gridX] === 1) {
+        return false;
+      }
     }
     
-    return maze[gridY][gridX] !== 1;
+    return true;
   }
   
   getTilePos() {
@@ -207,22 +226,41 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Round to nearest tile since characters are centered
-    const gridX = Math.round(x / TILE_SIZE);
-    const gridY = Math.round(y / TILE_SIZE);
+    // Check collision with character radius (not just center point)
+    const radius = TILE_SIZE / 2 - 2;
     
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14;
+    // Check all four corners of the bounding box
+    const points = [
+      { px: x - radius, py: y - radius }, // top-left
+      { px: x + radius, py: y - radius }, // top-right
+      { px: x - radius, py: y + radius }, // bottom-left
+      { px: x + radius, py: y + radius }  // bottom-right
+    ];
+    
+    for (let point of points) {
+      const gridX = Math.floor((point.px - TILE_SIZE / 2) / TILE_SIZE);
+      const gridY = Math.floor((point.py - TILE_SIZE / 2) / TILE_SIZE);
+      
+      // Allow tunnel on middle row
+      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+        if (gridY !== 14) return false;
+        continue;
+      }
+      
+      // If any corner hits a wall, can't move
+      if (maze[gridY][gridX] === 1) {
+        return false;
+      }
     }
     
-    return maze[gridY][gridX] !== 1;
+    return true;
   }
   
   getTilePos() {
-    // Round to nearest tile since character is centered
+    // Characters are centered at (tile * SIZE + SIZE/2), so subtract offset first
     return {
-      x: Math.round(this.x / TILE_SIZE),
-      y: Math.round(this.y / TILE_SIZE)
+      x: Math.floor((this.x - TILE_SIZE / 2) / TILE_SIZE),
+      y: Math.floor((this.y - TILE_SIZE / 2) / TILE_SIZE)
     };
   }
 }
