@@ -177,4 +177,4 @@ For support, please open an issue on GitHub or contact the development team.
 
 **Made with ❤️ for gamers everywhere**
 
-*Last updated: December 2024*
+*Last updated: December 2025*
