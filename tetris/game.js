@@ -302,12 +302,15 @@ class Tetris {
           break;
         case 'ArrowDown':
           e.preventDefault();
-          this.drop();
+          this.drop(); // Soft drop - move down one row
           break;
         case 'ArrowUp':
-        case ' ':
           e.preventDefault();
           this.rotate();
+          break;
+        case ' ':
+          e.preventDefault();
+          this.hardDrop(); // Hard drop - instant drop to bottom
           break;
         case 'p':
         case 'P':

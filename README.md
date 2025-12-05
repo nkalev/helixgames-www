@@ -30,9 +30,10 @@ Space invaders style arcade shooter. Defend Earth from waves of alien attackers!
 The legendary block-stacking puzzle game. Arrange falling tetrominoes to clear lines and score points!
 
 **Controls:**
-- Arrow keys ← →: Move piece
-- Arrow key ↓: Soft drop
-- Arrow key ↑ / Spacebar: Rotate
+- Arrow keys ← →: Move piece left/right
+- Arrow key ↓: Soft drop (one row)
+- Arrow key ↑: Rotate piece
+- Spacebar: Hard drop (instant)
 - P: Pause
 - R: Restart (when game over)
 
