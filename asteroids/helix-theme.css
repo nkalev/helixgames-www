@@ -31,6 +31,8 @@
   image-rendering: crisp-edges;
   image-rendering: pixelated;
   transition: box-shadow 0.3s ease;
+  /* Apply cyan color tint to game graphics */
+  filter: brightness(1.1) contrast(1.1) saturate(1.2) hue-rotate(140deg);
 }
 
 #canvas:hover {
