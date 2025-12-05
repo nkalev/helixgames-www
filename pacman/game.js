@@ -87,9 +87,9 @@ class PacMan {
       this.y += this.direction.y * this.speed;
     }
     
-    // Wrap around tunnel
-    if (this.x < 0) this.x = MAZE_WIDTH * TILE_SIZE;
-    if (this.x > MAZE_WIDTH * TILE_SIZE) this.x = 0;
+    // Wrap around tunnel (keep centered in tile)
+    if (this.x < TILE_SIZE / 2) this.x = MAZE_WIDTH * TILE_SIZE - TILE_SIZE / 2;
+    if (this.x > MAZE_WIDTH * TILE_SIZE - TILE_SIZE / 2) this.x = TILE_SIZE / 2;
   }
   
   canMove(x, y, maze) {
@@ -199,9 +199,9 @@ class Ghost {
       this.y += this.direction.y * this.speed;
     }
     
-    // Wrap around tunnel
-    if (this.x < 0) this.x = MAZE_WIDTH * TILE_SIZE;
-    if (this.x > MAZE_WIDTH * TILE_SIZE) this.x = 0;
+    // Wrap around tunnel (keep centered in tile)
+    if (this.x < TILE_SIZE / 2) this.x = MAZE_WIDTH * TILE_SIZE - TILE_SIZE / 2;
+    if (this.x > MAZE_WIDTH * TILE_SIZE - TILE_SIZE / 2) this.x = TILE_SIZE / 2;
   }
   
   canMove(x, y, maze) {
@@ -231,12 +231,13 @@ class Game {
     this.canvas.height = MAZE_HEIGHT * TILE_SIZE;
     
     this.maze = JSON.parse(JSON.stringify(MAZE_LAYOUT)); // Deep copy
-    this.pacman = new PacMan(14 * TILE_SIZE, 23 * TILE_SIZE);
+    // Center Pac-Man and ghosts in their tiles
+    this.pacman = new PacMan(14 * TILE_SIZE + TILE_SIZE / 2, 23 * TILE_SIZE + TILE_SIZE / 2);
     this.ghosts = [
-      new Ghost(12 * TILE_SIZE, 14 * TILE_SIZE, '#FF0000', 'Blinky'),
-      new Ghost(14 * TILE_SIZE, 14 * TILE_SIZE, '#FFB8FF', 'Pinky'),
-      new Ghost(13 * TILE_SIZE, 14 * TILE_SIZE, '#00FFFF', 'Inky'),
-      new Ghost(15 * TILE_SIZE, 14 * TILE_SIZE, '#FFB852', 'Clyde')
+      new Ghost(12 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, '#FF0000', 'Blinky'),
+      new Ghost(14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, '#FFB8FF', 'Pinky'),
+      new Ghost(13 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, '#00FFFF', 'Inky'),
+      new Ghost(15 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, '#FFB852', 'Clyde')
     ];
     
     this.score = 0;
