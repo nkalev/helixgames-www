@@ -51,6 +51,20 @@ The classic maze arcade game! Navigate mazes, eat pellets, avoid ghosts, and use
 - Progressive difficulty
 - Lives system
 
+### [Space Invaders](space-invaders/index.html)
+Defend Earth from waves of alien invaders in this classic shooter. Destroy them before they land!
+
+**Controls:**
+- Arrow keys ← →: Move ship
+- Spacebar: Shoot
+- R: Restart
+
+**Features:**
+- Destructible bunkers
+- Mystery ship (UFO)
+- Progressive difficulty
+- Multiple alien types
+
 ## 🚀 Quick Start
 
 This is a static HTML/JavaScript website. Simply serve the directory with any web server.

@@ -1,0 +1,89 @@
+/* Helix Games Theme for Space Invaders */
+
+:root {
+  --helix-primary: #3cd2a5;
+  --helix-primary-light: #5ddbb5;
+  --helix-bg-dark: #0a0e10;
+  --helix-bg-card: #1a1f23;
+  --helix-text: #ffffff;
+  --helix-text-muted: rgba(255, 255, 255, 0.6);
+}
+
+#game-container {
+  text-align: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.game-title {
+  color: var(--helix-primary);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(60, 210, 165, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.game-layout {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 20px auto;
+  flex-wrap: wrap;
+}
+
+#space-invaders-canvas {
+  background: #000000;
+  border: 3px solid var(--helix-primary);
+  display: block;
+  box-shadow: 0 0 20px rgba(60, 210, 165, 0.1);
+}
+
+.stats-panel {
+  background: var(--helix-bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(60, 210, 165, 0.2);
+  padding: 20px;
+  min-width: 200px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: rgba(60, 210, 165, 0.05);
+  border-radius: 8px;
+}
+
+.stat-label {
+  color: var(--helix-text-muted);
+}
+
+.stat-value {
+  color: var(--helix-primary);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.controls-panel {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--helix-bg-card);
+  border-radius: 12px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.control-key {
+  background: var(--helix-primary);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin: 0 4px;
+}
