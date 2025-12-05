@@ -1,61 +1,54 @@
-// Audio fix for Asteroids - prevent freezing on sound playback
-// This patches the SFX audio to be non-blocking
+// Audio fix for Asteroids - completely disable audio to prevent freezing
+// Audio playback causes game freezes due to browser autoplay policies
 
 (function() {
   'use strict';
   
-  // Wait for game to load
+  console.log('🔧 Disabling audio to prevent game freezing...');
+  
+  // Override Audio constructor to prevent any audio creation
+  var OriginalAudio = window.Audio;
+  window.Audio = function(src) {
+    console.log('Audio blocked:', src);
+    // Return a mock audio object that does nothing
+    return {
+      play: function() { 
+        return Promise.resolve(); // Always resolve successfully
+      },
+      pause: function() {},
+      load: function() {},
+      muted: true,
+      currentTime: 0,
+      duration: 0,
+      volume: 0
+    };
+  };
+  
+  // Also patch SFX if it gets created
+  var checkSFX = setInterval(function() {
+    if (typeof SFX !== 'undefined') {
+      clearInterval(checkSFX);
+      
+      // Force mute all audio
+      SFX.muted = true;
+      
+      // Replace all SFX functions with safe no-ops
+      SFX.laser = function() {
+        // Do nothing - no audio, no freezing
+        return { play: function() { return Promise.resolve(); } };
+      };
+      
+      SFX.explosion = function() {
+        // Do nothing - no audio, no freezing
+        return { play: function() { return Promise.resolve(); } };
+      };
+      
+      console.log('✅ Audio completely disabled - game will not freeze!');
+    }
+  }, 50);
+  
+  // Clear interval after 5 seconds to avoid memory leak
   setTimeout(function() {
-    if (typeof SFX === 'undefined') return;
-    
-    console.log('🔧 Applying audio safety patch...');
-    
-    // Create safe wrappers for audio
-    var originalLaser = SFX.laser;
-    var originalExplosion = SFX.explosion;
-    
-    // Safe laser function
-    SFX.laser = function() {
-      try {
-        if (originalLaser && typeof originalLaser === 'function') {
-          var audio = originalLaser.call(this);
-          if (audio && audio.play) {
-            var playPromise = audio.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(function(e) {
-                // Silently ignore autoplay errors
-                console.log('Audio play prevented (this is normal)');
-              });
-            }
-          }
-        }
-      } catch (e) {
-        // Silently fail - don't freeze the game
-        console.log('Audio error (non-critical):', e.message);
-      }
-    };
-    
-    // Safe explosion function
-    SFX.explosion = function() {
-      try {
-        if (originalExplosion && typeof originalExplosion === 'function') {
-          var audio = originalExplosion.call(this);
-          if (audio && audio.play) {
-            var playPromise = audio.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(function(e) {
-                // Silently ignore autoplay errors
-                console.log('Audio play prevented (this is normal)');
-              });
-            }
-          }
-        }
-      } catch (e) {
-        // Silently fail - don't freeze the game
-        console.log('Audio error (non-critical):', e.message);
-      }
-    };
-    
-    console.log('✅ Audio safety patch applied!');
-  }, 100);
+    clearInterval(checkSFX);
+  }, 5000);
 })();
