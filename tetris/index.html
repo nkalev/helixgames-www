@@ -124,75 +124,49 @@
 			<div id="game-container">
 				<h1 class="game-title">Tetris</h1>
 				
-				<div class="game-layout">
-					<!-- Main game canvas -->
-					<div>
-						<canvas id="tetris-canvas"></canvas>
+				<!-- Stats Above Game -->
+				<div class="stats-bar">
+					<div class="stat-item">
+						<span class="stat-label">Score:</span>
+						<span class="stat-value" id="score">0</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Lines:</span>
+						<span class="stat-value" id="lines">0</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Level:</span>
+						<span class="stat-value" id="level">1</span>
+					</div>
+					<div class="next-preview">
+						<span class="stat-label">Next:</span>
+						<canvas id="next-piece" width="80" height="80"></canvas>
+					</div>
+				</div>
+				
+				<!-- Game Canvas -->
+				<canvas id="tetris-canvas"></canvas>
+				
+				<!-- Controls + How to Play Below Game -->
+				<div class="info-panels">
+					<div class="controls-panel">
+						<h3>🎮 Controls</h3>
+						<div class="control-list">
+							<div><span class="control-key">← →</span> Move left/right</div>
+							<div><span class="control-key">↓</span> Soft drop (one row)</div>
+							<div><span class="control-key">↑</span> Rotate piece</div>
+							<div><span class="control-key">SPACE</span> Hard drop (instant)</div>
+							<div><span class="control-key">P</span> Pause</div>
+							<div><span class="control-key">R</span> Restart</div>
+						</div>
 					</div>
 					
-					<!-- Side panel -->
-					<div class="side-panel">
-						<!-- Stats -->
-						<div class="stats-panel">
-							<h3>📊 Stats</h3>
-							<div class="stat-item">
-								<span class="stat-label">Score</span>
-								<span class="stat-value" id="score">0</span>
-							</div>
-							<div class="stat-item">
-								<span class="stat-label">Lines</span>
-								<span class="stat-value" id="lines">0</span>
-							</div>
-							<div class="stat-item">
-								<span class="stat-label">Level</span>
-								<span class="stat-value" id="level">1</span>
-							</div>
-						</div>
-						
-						<!-- Next piece -->
-						<div class="next-panel">
-							<h3>Next Piece</h3>
-							<canvas id="next-piece" width="120" height="120"></canvas>
-						</div>
+					<div class="howto-panel">
+						<h3>📖 How to Play</h3>
+						<p>Arrange falling blocks (tetrominoes) to create complete horizontal lines. When a line is completed, it disappears and you earn points!</p>
+						<p><strong>Scoring:</strong> Clear multiple lines at once for bonus points. The game speeds up as you advance through levels.</p>
+						<p><strong>Tip:</strong> Use the "Next Piece" preview to plan ahead. Keep your stack low and avoid gaps!</p>
 					</div>
-				</div>
-				
-				<!-- Controls -->
-				<div class="controls-panel">
-					<h3>🎮 Controls</h3>
-					<div class="controls-grid">
-						<div class="control-item">
-							<span class="control-key">← →</span>
-							<span class="control-desc">Move left/right</span>
-						</div>
-						<div class="control-item">
-							<span class="control-key">↓</span>
-							<span class="control-desc">Soft drop (one row)</span>
-						</div>
-						<div class="control-item">
-							<span class="control-key">↑</span>
-							<span class="control-desc">Rotate piece</span>
-						</div>
-						<div class="control-item">
-							<span class="control-key">SPACE</span>
-							<span class="control-desc">Hard drop (instant)</span>
-						</div>
-						<div class="control-item">
-							<span class="control-key">P</span>
-							<span class="control-desc">Pause</span>
-						</div>
-						<div class="control-item">
-							<span class="control-key">R</span>
-							<span class="control-desc">Restart (game over)</span>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Instructions -->
-				<div class="game-instructions">
-					<p><strong>How to Play:</strong> Arrange falling blocks (tetrominoes) to create complete horizontal lines. When a line is completed, it disappears and you earn points!</p>
-					<p><strong>Scoring:</strong> Clear multiple lines at once for bonus points. The game speeds up as you advance through levels.</p>
-					<p><strong>Strategy:</strong> Plan ahead using the "Next Piece" preview. Try to keep your stack low and avoid creating gaps!</p>
 				</div>
 			</div>
 		</div>
