@@ -93,17 +93,17 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Simple approach: just check the center tile
-    // Characters are 8px radius, tiles are 20px, so they fit with margin
-    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
+    // For centered characters, use Math.round to determine which tile they're in
+    // This handles both positive and negative movement directions correctly
+    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
     
     // Allow tunnel on row 14
     if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
       return gridY === 14;
     }
     
-    // Simply check if the center is in a wall tile
+    // Check if the center is in a wall tile
     return maze[gridY][gridX] !== 1;
   }
   
@@ -210,9 +210,9 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Simple center-point collision (same as PacMan)
-    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Use Math.round for centered characters (same as PacMan)
+    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
     
     if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
       return gridY === 14;
