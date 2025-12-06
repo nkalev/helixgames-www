@@ -143,44 +143,43 @@
 		    <div id="game-container">
       			<h1 class="game-title">Asteroids</h1>
       			
-      			<!-- Game Controls Guide -->
-      			<div class="game-controls">
-      			  <h3>🎮 Controls</h3>
-      			  <div class="control-grid">
-      			    <div class="control-item">
-      			      <span class="control-key">← →</span>
-      			      <span class="control-desc">Rotate ship</span>
-      			    </div>
-      			    <div class="control-item">
-      			      <span class="control-key">↑</span>
-      			      <span class="control-desc">Thrust forward</span>
-      			    </div>
-      			    <div class="control-item">
-      			      <span class="control-key">SPACE</span>
-      			      <span class="control-desc">Fire weapon</span>
-      			    </div>
-      			    <div class="control-item">
-      			      <span class="control-key">P</span>
-      			      <span class="control-desc">Pause game</span>
-      			    </div>
-      			    <div class="control-item">
-      			      <span class="control-key">M</span>
-      			      <span class="control-desc">Mute sound</span>
-      			    </div>
-      			    <div class="control-item">
-      			      <span class="control-key">F</span>
-      			      <span class="control-desc">Show FPS</span>
-      			    </div>
+      			<!-- Stats Above Game -->
+      			<div class="stats-bar">
+      			  <div class="stat-item">
+      			    <span class="stat-label">Score:</span>
+      			    <span class="stat-value" id="score">0</span>
+      			  </div>
+      			  <div class="stat-item">
+      			    <span class="stat-label">Lives:</span>
+      			    <span class="stat-value" id="lives">3</span>
       			  </div>
       			</div>
       			
-      			<div class="text-center">
+      			<!-- Game Canvas -->
+      			<div class="canvas-container">
       			  <canvas id="canvas" width="780" height="540"></canvas>
       			</div>
       			
-      			<div class="game-instructions">
-      			  <p><strong>Objective:</strong> Destroy all asteroids and enemy ships while surviving as long as possible!</p>
-      			  <p><strong>Tip:</strong> Use momentum and inertia to your advantage. Watch out for UFOs!</p>
+      			<!-- Controls + How to Play Below Game -->
+      			<div class="info-panels">
+      			  <div class="controls-panel">
+      			    <h3>🎮 Controls</h3>
+      			    <div class="control-list">
+      			      <div><span class="control-key">← →</span> Rotate ship</div>
+      			      <div><span class="control-key">↑</span> Thrust forward</div>
+      			      <div><span class="control-key">SPACE</span> Fire weapon</div>
+      			      <div><span class="control-key">P</span> Pause</div>
+      			      <div><span class="control-key">M</span> Mute</div>
+      			      <div><span class="control-key">F</span> Show FPS</div>
+      			    </div>
+      			  </div>
+      			  
+      			  <div class="howto-panel">
+      			    <h3>📖 How to Play</h3>
+      			    <p>Destroy all asteroids and enemy UFOs while surviving as long as possible! Your ship has inertia-based physics for realistic space movement.</p>
+      			    <p><strong>Strategy:</strong> Break large asteroids into smaller pieces. Watch your momentum in the void of space!</p>
+      			    <p><strong>Tip:</strong> UFOs appear randomly - destroy them for bonus points but watch their counter-fire!</p>
+      			  </div>
       			</div>
       			
       			<!-- Mobile touch controls -->
