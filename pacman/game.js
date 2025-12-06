@@ -95,9 +95,9 @@ class PacMan {
   canMove(x, y, maze) {
     // Check the tile at the character's position
     // For centered characters: position is at tile_center (tile * SIZE + SIZE/2)
-    // We need to check which tile(s) the character occupies
+    // Character radius is TILE_SIZE/2 - 2 = 8 pixels
     
-    const buffer = 4; // Small buffer to prevent getting stuck in corners
+    const radius = TILE_SIZE / 2 - 2; // 8 pixels - actual character size
     
     // Check the center point
     const centerGridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
@@ -113,13 +113,13 @@ class PacMan {
       return false;
     }
     
-    // Additionally, check the corners of a small bounding box around the center
+    // Additionally, check the corners of character's bounding box
     // This prevents the character from clipping into walls
     const checkPoints = [
-      { x: x - buffer, y: y - buffer }, // top-left
-      { x: x + buffer, y: y - buffer }, // top-right
-      { x: x - buffer, y: y + buffer }, // bottom-left
-      { x: x + buffer, y: y + buffer }  // bottom-right
+      { x: x - radius, y: y - radius }, // top-left
+      { x: x + radius, y: y - radius }, // top-right
+      { x: x - radius, y: y + radius }, // bottom-left
+      { x: x + radius, y: y + radius }  // bottom-right
     ];
     
     for (let point of checkPoints) {
@@ -245,7 +245,8 @@ class Ghost {
   
   canMove(x, y, maze) {
     // Same collision detection as PacMan for consistency
-    const buffer = 4;
+    // Ghost radius matches character radius: TILE_SIZE/2 - 2 = 8 pixels
+    const radius = TILE_SIZE / 2 - 2;
     
     const centerGridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
     const centerGridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
@@ -259,10 +260,10 @@ class Ghost {
     }
     
     const checkPoints = [
-      { x: x - buffer, y: y - buffer },
-      { x: x + buffer, y: y - buffer },
-      { x: x - buffer, y: y + buffer },
-      { x: x + buffer, y: y + buffer }
+      { x: x - radius, y: y - radius },
+      { x: x + radius, y: y - radius },
+      { x: x - radius, y: y + radius },
+      { x: x + radius, y: y + radius }
     ];
     
     for (let point of checkPoints) {
