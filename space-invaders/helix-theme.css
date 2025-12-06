@@ -87,3 +87,79 @@
   font-weight: bold;
   margin: 0 4px;
 }
+
+/* Mobile Touch Controls */
+.mobile-controls {
+  display: none; /* Hidden by default, shown on mobile */
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--helix-bg-card);
+  border-radius: 12px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mobile-controls-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  align-items: center;
+}
+
+.mobile-btn {
+  background: var(--helix-primary);
+  color: #000;
+  border: none;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 4px 10px rgba(60, 210, 165, 0.3);
+  transition: all 0.1s;
+  min-width: 80px;
+  min-height: 80px;
+}
+
+.mobile-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(60, 210, 165, 0.5);
+}
+
+.mobile-btn-move {
+  background: rgba(60, 210, 165, 0.3);
+  color: var(--helix-primary);
+  border: 2px solid var(--helix-primary);
+}
+
+.mobile-btn-fire {
+  background: var(--helix-primary);
+  color: #000;
+  font-size: 18px;
+  flex: 1;
+  max-width: 150px;
+}
+
+/* Show mobile controls on small screens */
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: block;
+  }
+  
+  #space-invaders-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .game-layout {
+    flex-direction: column;
+  }
+  
+  .controls-panel p {
+    font-size: 14px;
+  }
+}

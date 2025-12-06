@@ -519,9 +519,11 @@ class Game {
   }
 }
 
-// Initialize
+// Initialize game instance (global for touch controls)
+let gameInstance = null;
+
 window.addEventListener('DOMContentLoaded', () => {
-  new Game();
+  gameInstance = new Game();
 });
 
 // Mute toggle function
@@ -530,5 +532,36 @@ function toggleMute() {
   const btn = document.getElementById('muteToggle');
   if (btn) {
     btn.textContent = muted ? '🔇 Sound OFF' : '🔊 Sound ON';
+  }
+}
+
+// Touch control functions for mobile
+
+function touchLeft(pressed) {
+  if (gameInstance) {
+    gameInstance.keys.left = pressed;
+  }
+}
+
+function touchRight(pressed) {
+  if (gameInstance) {
+    gameInstance.keys.right = pressed;
+  }
+}
+
+function touchFire() {
+  if (gameInstance && gameInstance.state === 'playing') {
+    if (gameInstance.bullets.length === 0) {
+      gameInstance.bullets.push({
+        x: gameInstance.player.x,
+        y: gameInstance.player.y - 15,
+        width: 4,
+        height: 10,
+        active: true
+      });
+      audioManager.shoot();
+    }
+  } else if (gameInstance && gameInstance.state === 'start') {
+    gameInstance.state = 'playing';
   }
 }
