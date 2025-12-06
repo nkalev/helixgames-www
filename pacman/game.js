@@ -93,47 +93,31 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Check the tile at the character's position
-    // For centered characters: position is at tile_center (tile * SIZE + SIZE/2)
-    // Character radius is TILE_SIZE/2 - 2 = 8 pixels
+    // Use a margin smaller than the visual radius to allow easier cornering
+    // Visual radius is 8px, but use 6px for collision to be more forgiving
+    const margin = 6;
     
-    const radius = TILE_SIZE / 2 - 2; // 8 pixels - actual character size
-    
-    // Check the center point
-    const centerGridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
-    const centerGridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
-    
-    // Check if center is in tunnel
-    if (centerGridX < 0 || centerGridX >= MAZE_WIDTH || centerGridY < 0 || centerGridY >= MAZE_HEIGHT) {
-      return centerGridY === 14; // Allow tunnel
-    }
-    
-    // Check center tile
-    if (maze[centerGridY][centerGridX] === 1) {
-      return false;
-    }
-    
-    // Additionally, check the corners of character's bounding box
-    // This prevents the character from clipping into walls
+    // Check center + small radius around it
     const checkPoints = [
-      { x: x - radius, y: y - radius }, // top-left
-      { x: x + radius, y: y - radius }, // top-right
-      { x: x - radius, y: y + radius }, // bottom-left
-      { x: x + radius, y: y + radius }  // bottom-right
+      { x: x, y: y },              // center
+      { x: x - margin, y: y },     // left
+      { x: x + margin, y: y },     // right
+      { x: x, y: y - margin },     // top
+      { x: x, y: y + margin }      // bottom
     ];
     
     for (let point of checkPoints) {
-      const px = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
-      const py = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
+      const gridX = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
+      const gridY = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
       
-      // Skip out of bounds (tunnel area)
-      if (px < 0 || px >= MAZE_WIDTH || py < 0 || py >= MAZE_HEIGHT) {
-        if (py !== 14) return false; // Only allow tunnel on row 14
+      // Allow tunnel on row 14
+      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+        if (gridY !== 14) return false;
         continue;
       }
       
-      // Check if this corner hits a wall
-      if (maze[py][px] === 1) {
+      // Check if this point hits a wall
+      if (maze[gridY][gridX] === 1) {
         return false;
       }
     }
@@ -245,37 +229,26 @@ class Ghost {
   
   canMove(x, y, maze) {
     // Same collision detection as PacMan for consistency
-    // Ghost radius matches character radius: TILE_SIZE/2 - 2 = 8 pixels
-    const radius = TILE_SIZE / 2 - 2;
-    
-    const centerGridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
-    const centerGridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
-    
-    if (centerGridX < 0 || centerGridX >= MAZE_WIDTH || centerGridY < 0 || centerGridY >= MAZE_HEIGHT) {
-      return centerGridY === 14;
-    }
-    
-    if (maze[centerGridY][centerGridX] === 1) {
-      return false;
-    }
+    const margin = 6;
     
     const checkPoints = [
-      { x: x - radius, y: y - radius },
-      { x: x + radius, y: y - radius },
-      { x: x - radius, y: y + radius },
-      { x: x + radius, y: y + radius }
+      { x: x, y: y },
+      { x: x - margin, y: y },
+      { x: x + margin, y: y },
+      { x: x, y: y - margin },
+      { x: x, y: y + margin }
     ];
     
     for (let point of checkPoints) {
-      const px = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
-      const py = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
+      const gridX = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
+      const gridY = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
       
-      if (px < 0 || px >= MAZE_WIDTH || py < 0 || py >= MAZE_HEIGHT) {
-        if (py !== 14) return false;
+      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+        if (gridY !== 14) return false;
         continue;
       }
       
-      if (maze[py][px] === 1) {
+      if (maze[gridY][gridX] === 1) {
         return false;
       }
     }
