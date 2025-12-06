@@ -93,18 +93,36 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // For centered characters, use Math.round to determine which tile they're in
-    // This handles both positive and negative movement directions correctly
-    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Add a small buffer (4px) to keep character visually away from walls
+    // Character radius is 8px, this keeps 4px clearance from wall edges
+    const buffer = 4;
     
-    // Allow tunnel on row 14
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14;
+    // Check center and points slightly offset in each direction
+    const points = [
+      { px: x, py: y },                    // center
+      { px: x - buffer, py: y },           // left
+      { px: x + buffer, py: y },           // right  
+      { px: x, py: y - buffer },           // top
+      { px: x, py: y + buffer }            // bottom
+    ];
+    
+    for (let point of points) {
+      const gridX = Math.round((point.px - TILE_SIZE / 2) / TILE_SIZE);
+      const gridY = Math.round((point.py - TILE_SIZE / 2) / TILE_SIZE);
+      
+      // Allow tunnel on row 14
+      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+        if (gridY !== 14) return false;
+        continue;
+      }
+      
+      // Check if any point hits a wall
+      if (maze[gridY][gridX] === 1) {
+        return false;
+      }
     }
     
-    // Check if the center is in a wall tile
-    return maze[gridY][gridX] !== 1;
+    return true;
   }
   
   getTilePos() {
@@ -210,15 +228,32 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Use Math.round for centered characters (same as PacMan)
-    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Same buffered collision as PacMan
+    const buffer = 4;
     
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14;
+    const points = [
+      { px: x, py: y },
+      { px: x - buffer, py: y },
+      { px: x + buffer, py: y },
+      { px: x, py: y - buffer },
+      { px: x, py: y + buffer }
+    ];
+    
+    for (let point of points) {
+      const gridX = Math.round((point.px - TILE_SIZE / 2) / TILE_SIZE);
+      const gridY = Math.round((point.py - TILE_SIZE / 2) / TILE_SIZE);
+      
+      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+        if (gridY !== 14) return false;
+        continue;
+      }
+      
+      if (maze[gridY][gridX] === 1) {
+        return false;
+      }
     }
     
-    return maze[gridY][gridX] !== 1;
+    return true;
   }
   
   getTilePos() {
