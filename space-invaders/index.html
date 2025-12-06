@@ -124,41 +124,47 @@
 			<div id="game-container">
 				<h1 class="game-title">Space Invaders</h1>
 				
-				<div class="game-layout">
-					<!-- Game Canvas -->
-					<canvas id="space-invaders-canvas"></canvas>
-					
-					<!-- Stats -->
-					<div class="stats-panel">
-						<h3>📊 Stats</h3>
-						<div class="stat-item">
-							<span class="stat-label">Score</span>
-							<span class="stat-value" id="score">0</span>
-						</div>
-						<div class="stat-item">
-							<span class="stat-label">Lives</span>
-							<span class="stat-value" id="lives">3</span>
-						</div>
-						<div class="stat-item">
-							<span class="stat-label">Level</span>
-							<span class="stat-value" id="level">1</span>
-						</div>
+				<!-- Stats Above Game -->
+				<div class="stats-bar">
+					<div class="stat-item">
+						<span class="stat-label">Score:</span>
+						<span class="stat-value" id="score">0</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Lives:</span>
+						<span class="stat-value" id="lives">3</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Level:</span>
+						<span class="stat-value" id="level">1</span>
 					</div>
 				</div>
 				
-				<div class="controls-panel">
-					<h3>🎮 Controls</h3>
-					<p>
-						<span class="control-key">←</span> <span class="control-key">→</span> Move Ship
-						<span class="control-key">SPACE</span> Shoot
-						<span class="control-key">R</span> Restart
-						<span class="control-key">M</span> Mute/Unmute
-					</p>
-					<p style="margin-top: 10px;">
-						<button id="muteToggle" onclick="toggleMute()" style="background: var(--helix-primary); color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-							🔊 Sound ON
-						</button>
-					</p>
+				<!-- Game Canvas -->
+				<canvas id="space-invaders-canvas"></canvas>
+				
+				<!-- Controls + How to Play Below Game -->
+				<div class="info-panels">
+					<div class="controls-panel">
+						<h3>🎮 Controls</h3>
+						<div class="control-list">
+							<div><span class="control-key">←</span> <span class="control-key">→</span> Move Ship</div>
+							<div><span class="control-key">SPACE</span> Shoot</div>
+							<div><span class="control-key">R</span> Restart</div>
+							<div><span class="control-key">M</span> Mute/Unmute</div>
+						</div>
+						<p style="margin-top: 10px;">
+							<button id="muteToggle" onclick="toggleMute()" style="background: var(--helix-primary); color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+								🔊 Sound ON
+							</button>
+						</p>
+					</div>
+					
+					<div class="howto-panel">
+						<h3>📖 How to Play</h3>
+						<p>Defend Earth from waves of alien invaders! Move your ship left and right, shoot the aliens before they reach the bottom. Use bunkers for cover, but they'll erode with damage. Watch for the mystery UFO for bonus points!</p>
+						<p><strong>Tip:</strong> Aliens speed up as you destroy them - aim for the bottom rows first!</p>
+					</div>
 				</div>
 				
 				<!-- Mobile Touch Controls -->
