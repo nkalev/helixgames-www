@@ -124,74 +124,61 @@
 			<div id="game-container">
 				<h1 class="game-title">Pac-Man</h1>
 				
-				<div class="game-layout">
-					<!-- Main game canvas -->
-					<div>
-						<canvas id="pacman-canvas"></canvas>
+				<!-- Stats Above Game -->
+				<div class="stats-bar">
+					<div class="stat-item">
+						<span class="stat-label">Score:</span>
+						<span class="stat-value" id="score">0</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Lives:</span>
+						<span class="stat-value" id="lives">3</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Level:</span>
+						<span class="stat-value" id="level">1</span>
+					</div>
+				</div>
+				
+				<!-- Game Canvas -->
+				<canvas id="pacman-canvas"></canvas>
+				
+				<!-- Controls + How to Play Below Game -->
+				<div class="info-panels">
+					<div class="controls-panel">
+						<h3>🎮 Controls</h3>
+						<div class="control-list">
+							<div><span class="control-key">Arrow Keys</span> Move Pac-Man</div>
+							<div><span class="control-key">R</span> Restart</div>
+						</div>
+						<h4 style="margin-top: 15px; color: var(--helix-primary);">🎮 Game Elements</h4>
+						<div class="legend">
+							<div class="legend-item">
+								<div class="legend-dot" style="background: #FFFF00;"></div>
+								<span>Pac-Man (you!)</span>
+							</div>
+							<div class="legend-item">
+								<div class="legend-dot" style="background: #FFB852;"></div>
+								<span>Pellets (10 pts)</span>
+							</div>
+							<div class="legend-item">
+								<div class="legend-dot" style="background: #3cd2a5;"></div>
+								<span>Power Pellets (50 pts)</span>
+							</div>
+							<div class="legend-item">
+								<div class="legend-dot" style="background: #FF0000;"></div>
+								<span>Ghosts (avoid!)</span>
+							</div>
+						</div>
 					</div>
 					
-					<!-- Stats panel -->
-					<div class="stats-panel">
-						<h3>📊 Stats</h3>
-						<div class="stat-item">
-							<span class="stat-label">Score</span>
-							<span class="stat-value" id="score">0</span>
-						</div>
-						<div class="stat-item">
-							<span class="stat-label">Lives</span>
-							<span class="stat-value" id="lives">3</span>
-						</div>
-						<div class="stat-item">
-							<span class="stat-label">Level</span>
-							<span class="stat-value" id="level">1</span>
-						</div>
+					<div class="howto-panel">
+						<h3>📖 How to Play</h3>
+						<p>Navigate the maze and eat all pellets while avoiding ghosts. The game starts when you press any arrow key!</p>
+						<p><strong>Power Pellets:</strong> Eat large cyan pellets to turn ghosts blue. Eat them for 200 pts each!</p>
+						<p><strong>Strategy:</strong> Plan your route efficiently. Use power pellets wisely to clear ghosts. Use the side tunnels to escape!</p>
+						<p><strong>Tip:</strong> Each ghost has unique behavior - some chase directly, others try to cut you off!</p>
 					</div>
-				</div>
-				
-				<!-- Game Info -->
-				<div class="game-info">
-					<h4>🎮 Game Elements</h4>
-					<div class="legend">
-						<div class="legend-item">
-							<div class="legend-dot" style="background: #FFFF00;"></div>
-							<span class="legend-text">Pac-Man (you!)</span>
-						</div>
-						<div class="legend-item">
-							<div class="legend-dot" style="background: #FFB852;"></div>
-							<span class="legend-text">Pellets (10 pts)</span>
-						</div>
-						<div class="legend-item">
-							<div class="legend-dot" style="background: #3cd2a5;"></div>
-							<span class="legend-text">Power Pellets (50 pts)</span>
-						</div>
-						<div class="legend-item">
-							<div class="legend-dot" style="background: #FF0000;"></div>
-							<span class="legend-text">Ghosts (avoid!)</span>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Controls -->
-				<div class="controls-panel">
-					<h3>🎮 Controls</h3>
-					<div class="controls-grid">
-						<div class="control-item">
-							<span class="control-key">Arrow Keys</span>
-							<span class="control-desc">Move Pac-Man up/down/left/right</span>
-						</div>
-						<div class="control-item">
-							<span class="control-key">R</span>
-							<span class="control-desc">Restart (after game over)</span>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Instructions -->
-				<div class="game-instructions">
-					<p><strong>How to Play:</strong> Navigate the maze and eat all the pellets while avoiding the four ghosts. The game starts when you press any arrow key!</p>
-					<p><strong>Power Pellets:</strong> Eat the large cyan pellets to turn the ghosts blue for a limited time. While blue, you can eat them for bonus points (200 pts each)!</p>
-					<p><strong>Strategy:</strong> Plan your route to collect all pellets efficiently. Use power pellets wisely to clear ghosts from your path. Watch out for the tunnel on the sides - you can escape through it!</p>
-					<p><strong>Ghosts:</strong> Each ghost has its own personality - some chase you directly, others try to cut you off. Stay alert and keep moving!</p>
 				</div>
 			</div>
 		</div>
