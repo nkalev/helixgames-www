@@ -93,36 +93,18 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Use a margin smaller than the visual radius to allow easier cornering
-    // Visual radius is 8px, but use 6px for collision to be more forgiving
-    const margin = 6;
+    // Simple approach: just check the center tile
+    // Characters are 8px radius, tiles are 20px, so they fit with margin
+    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
     
-    // Check center + small radius around it
-    const checkPoints = [
-      { x: x, y: y },              // center
-      { x: x - margin, y: y },     // left
-      { x: x + margin, y: y },     // right
-      { x: x, y: y - margin },     // top
-      { x: x, y: y + margin }      // bottom
-    ];
-    
-    for (let point of checkPoints) {
-      const gridX = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
-      const gridY = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
-      
-      // Allow tunnel on row 14
-      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-        if (gridY !== 14) return false;
-        continue;
-      }
-      
-      // Check if this point hits a wall
-      if (maze[gridY][gridX] === 1) {
-        return false;
-      }
+    // Allow tunnel on row 14
+    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+      return gridY === 14;
     }
     
-    return true;
+    // Simply check if the center is in a wall tile
+    return maze[gridY][gridX] !== 1;
   }
   
   getTilePos() {
@@ -228,32 +210,15 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Same collision detection as PacMan for consistency
-    const margin = 6;
+    // Simple center-point collision (same as PacMan)
+    const gridX = Math.floor((x - TILE_SIZE / 2) / TILE_SIZE);
+    const gridY = Math.floor((y - TILE_SIZE / 2) / TILE_SIZE);
     
-    const checkPoints = [
-      { x: x, y: y },
-      { x: x - margin, y: y },
-      { x: x + margin, y: y },
-      { x: x, y: y - margin },
-      { x: x, y: y + margin }
-    ];
-    
-    for (let point of checkPoints) {
-      const gridX = Math.floor((point.x - TILE_SIZE / 2) / TILE_SIZE);
-      const gridY = Math.floor((point.y - TILE_SIZE / 2) / TILE_SIZE);
-      
-      if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-        if (gridY !== 14) return false;
-        continue;
-      }
-      
-      if (maze[gridY][gridX] === 1) {
-        return false;
-      }
+    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
+      return gridY === 14;
     }
     
-    return true;
+    return maze[gridY][gridX] !== 1;
   }
   
   getTilePos() {
