@@ -134,17 +134,20 @@
 		
 		<!-- BEGIN #content -->
 		<div id="content" class="app-content">
-			  <div class="container">
-			    <div class="heading">
-			      <h1 style="color: #3cd2a5; margin-bottom: 20px; font-size: 2.5rem; font-weight: 700;">2048 Game</h1>
-			      <div class="scores-container">
-			        <div class="score-container">0</div>
-			        <div class="best-container">0</div>
+			  <div class="container" id="game-container">
+			    <h1 class="game-title">2048</h1>
+			    
+			    <!-- Stats Above Game -->
+			    <div class="stats-bar">
+			      <div class="stat-item">
+			        <span class="stat-label">Score:</span>
+			        <span class="stat-value score-container">0</span>
 			      </div>
-			    </div>
-
-			    <div class="above-game">
-			 	   <a class="restart-button">New Game</a>
+			      <div class="stat-item">
+			        <span class="stat-label">Best:</span>
+			        <span class="stat-value best-container">0</span>
+			      </div>
+			      <button class="restart-button">New Game</button>
 			    </div>
 
 			    <div class="game-container">
@@ -188,12 +191,23 @@
 			      </div>
 			    </div>
 
-			    <p class="game-explanation">
-			      <strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong>
-			    </p>
-			    <p>
-			    Created by <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli.</a> Based on <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank">1024 by Veewo Studio</a> and conceptually similar to <a href="http://asherv.com/threes/" target="_blank">Threes by Asher Vollmer.</a>
-			    </p>
+			    <!-- Controls + How to Play Below Game -->
+			    <div class="info-panels">
+			      <div class="controls-panel">
+			        <h3>🎮 Controls</h3>
+			        <div class="control-list">
+			          <div><span class="control-key">↑ ↓ ← →</span> Move tiles</div>
+			          <div><span class="control-key">New Game</span> Restart</div>
+			        </div>
+			      </div>
+			      
+			      <div class="howto-panel">
+			        <h3>📖 How to Play</h3>
+			        <p>Use your <strong>arrow keys</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong></p>
+			        <p><strong>Goal:</strong> Create a tile with the number 2048 to win!</p>
+			        <p><strong>Tip:</strong> Keep your highest tile in a corner and build around it for better strategy.</p>
+			      </div>
+			    </div>
 			  </div>
 
 			  <script src="js/bind_polyfill.js"></script>
