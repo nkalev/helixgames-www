@@ -233,17 +233,19 @@ class Tetris {
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
     
-    const offsetX = (4 - this.nextPiece.shape[0].length) * BLOCK_SIZE / 2;
-    const offsetY = (4 - this.nextPiece.shape.length) * BLOCK_SIZE / 2;
+    // Use larger block size for preview (25px instead of 30px from main game)
+    const previewBlockSize = 25;
+    const offsetX = (nextCanvas.width - this.nextPiece.shape[0].length * previewBlockSize) / 2;
+    const offsetY = (nextCanvas.height - this.nextPiece.shape.length * previewBlockSize) / 2;
     
     this.nextPiece.shape.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value) {
           ctx.fillStyle = COLORS[value];
-          ctx.fillRect(offsetX + x * BLOCK_SIZE, offsetY + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+          ctx.fillRect(offsetX + x * previewBlockSize, offsetY + y * previewBlockSize, previewBlockSize, previewBlockSize);
           ctx.strokeStyle = '#0a0e10';
           ctx.lineWidth = 2;
-          ctx.strokeRect(offsetX + x * BLOCK_SIZE, offsetY + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+          ctx.strokeRect(offsetX + x * previewBlockSize, offsetY + y * previewBlockSize, previewBlockSize, previewBlockSize);
         }
       });
     });
