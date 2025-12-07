@@ -21,6 +21,7 @@
 	<!-- ================== BEGIN core-css ================== -->
 	<link href="assets/css/vendor.min.css" rel="stylesheet" />
 	<link href="assets/css/app.min.css" rel="stylesheet" />
+	<link href="home-style.css" rel="stylesheet" />
 	<!-- ================== END core-css ================== -->
 	
 </head>
@@ -130,11 +131,226 @@
 		
 		<!-- BEGIN #content -->
 		<div id="content" class="app-content">
-			<div class="text-center">
-				<h3>Playing games should be fun</h3>
-				<br><br><br>
-				<p>Check out some fun games in our menu while we are building ...</p>
-			</div>
+			<!-- Hero Section -->
+			<section class="hero-section">
+				<div class="hero-content">
+					<h1 class="hero-title">HELIX GAMES</h1>
+					<p class="hero-subtitle">Classic Arcade Games. Modern Experience. Zero Downloads.</p>
+					<div class="hero-cta">
+						<a href="#games" class="cta-button cta-primary">
+							<i class="bi bi-controller"></i>
+							Play Now
+						</a>
+						<a href="#features" class="cta-button cta-secondary">
+							<i class="bi bi-star"></i>
+							See Features
+						</a>
+					</div>
+				</div>
+			</section>
+			
+			<!-- Stats Section -->
+			<section class="stats-section">
+				<div class="stats-grid">
+					<div class="stat-card">
+						<span class="stat-number">7</span>
+						<span class="stat-label">Games</span>
+					</div>
+					<div class="stat-card">
+						<span class="stat-number">∞</span>
+						<span class="stat-label">Hours of Fun</span>
+					</div>
+					<div class="stat-card">
+						<span class="stat-number">100%</span>
+						<span class="stat-label">Free</span>
+					</div>
+					<div class="stat-card">
+						<span class="stat-number">0</span>
+						<span class="stat-label">Downloads</span>
+					</div>
+				</div>
+			</section>
+			
+			<!-- Games Section -->
+			<section class="games-section" id="games">
+				<div class="section-header">
+					<h2 class="section-title">Choose Your Game</h2>
+					<p class="section-subtitle">Classic arcade games reimagined for the modern web</p>
+				</div>
+				
+				<div class="games-grid">
+					<!-- 2048 -->
+					<a href="2048/index.html" class="game-card">
+						<div class="game-thumbnail">🎯</div>
+						<div class="game-info">
+							<h3 class="game-name">2048</h3>
+							<p class="game-description">Slide and combine tiles to reach 2048. A simple yet addictive puzzle game that's easy to learn but hard to master.</p>
+							<div class="game-tags">
+								<span class="game-tag">Puzzle</span>
+								<span class="game-tag">Strategy</span>
+							</div>
+							<div class="play-button">
+								<i class="bi bi-play-circle"></i>
+								Play Now
+							</div>
+						</div>
+					</a>
+					
+					<!-- Asteroids -->
+					<a href="asteroids/index.html" class="game-card">
+						<div class="game-thumbnail">🚀</div>
+						<div class="game-info">
+							<h3 class="game-name">Asteroids</h3>
+							<p class="game-description">Navigate space and destroy asteroids while avoiding UFOs. Classic vector graphics action with physics-based gameplay.</p>
+							<div class="game-tags">
+								<span class="game-tag">Action</span>
+								<span class="game-tag">Arcade</span>
+							</div>
+							<div class="play-button">
+								<i class="bi bi-play-circle"></i>
+								Play Now
+							</div>
+						</div>
+					</a>
+					
+					<!-- Invasion -->
+					<a href="invasion/index.html" class="game-card">
+						<div class="game-thumbnail">👾</div>
+						<div class="game-info">
+							<h3 class="game-name">Alien Invasion</h3>
+							<p class="game-description">Defend Earth from waves of alien invaders! Fast-paced shooting action with increasing difficulty.</p>
+							<div class="game-tags">
+								<span class="game-tag">Shooter</span>
+								<span class="game-tag">Action</span>
+							</div>
+							<div class="play-button">
+								<i class="bi bi-play-circle"></i>
+								Play Now
+							</div>
+						</div>
+					</a>
+					
+					<!-- Lode Runner -->
+					<a href="lode-runner/index.html" class="game-card">
+						<div class="game-thumbnail">🏃</div>
+						<div class="game-info">
+							<h3 class="game-name">Lode Runner</h3>
+							<p class="game-description">Collect gold while avoiding guards in this puzzle-platformer. Dig holes to trap enemies and escape!</p>
+							<div class="game-tags">
+								<span class="game-tag">Puzzle</span>
+								<span class="game-tag">Platform</span>
+							</div>
+							<div class="play-button">
+								<i class="bi bi-play-circle"></i>
+								Play Now
+							</div>
+						</div>
+					</a>
+					
+					<!-- Pac-Man -->
+					<a href="pacman/index.html" class="game-card">
+						<div class="game-thumbnail">🟡</div>
+						<div class="game-info">
+							<h3 class="game-name">Pac-Man</h3>
+							<p class="game-description">Navigate mazes, eat dots, and avoid ghosts in this timeless classic. Simple controls, endless fun!</p>
+							<div class="game-tags">
+								<span class="game-tag">Arcade</span>
+								<span class="game-tag">Classic</span>
+							</div>
+							<div class="play-button">
+								<i class="bi bi-play-circle"></i>
+								Play Now
+							</div>
+						</div>
+					</a>
+					
+					<!-- Space Invaders -->
+					<a href="space-invaders/index.html" class="game-card">
+						<div class="game-thumbnail">🛸</div>
+						<div class="game-info">
+							<h3 class="game-name">Space Invaders</h3>
+							<p class="game-description">The game that started it all. Shoot down waves of descending aliens before they reach Earth!</p>
+							<div class="game-tags">
+								<span class="game-tag">Shooter</span>
+								<span class="game-tag">Classic</span>
+							</div>
+							<div class="play-button">
+								<i class="bi bi-play-circle"></i>
+								Play Now
+							</div>
+						</div>
+					</a>
+					
+					<!-- Tetris -->
+					<a href="tetris/index.html" class="game-card">
+						<div class="game-thumbnail">🧩</div>
+						<div class="game-info">
+							<h3 class="game-name">Tetris</h3>
+							<p class="game-description">Arrange falling blocks to create complete lines. The ultimate puzzle game that defined a generation.</p>
+							<div class="game-tags">
+								<span class="game-tag">Puzzle</span>
+								<span class="game-tag">Classic</span>
+							</div>
+							<div class="play-button">
+								<i class="bi bi-play-circle"></i>
+								Play Now
+							</div>
+						</div>
+					</a>
+				</div>
+			</section>
+			
+			<!-- Features Section -->
+			<section class="features-section" id="features">
+				<div class="section-header">
+					<h2 class="section-title">Why Helix Games?</h2>
+					<p class="section-subtitle">The best way to enjoy classic arcade games</p>
+				</div>
+				
+				<div class="features-grid">
+					<div class="feature-card">
+						<div class="feature-icon">⚡</div>
+						<h3 class="feature-title">Instant Play</h3>
+						<p class="feature-description">No downloads, no installations. Just click and play directly in your browser.</p>
+					</div>
+					
+					<div class="feature-card">
+						<div class="feature-icon">🏆</div>
+						<h3 class="feature-title">Leaderboards</h3>
+						<p class="feature-description">Compete with players worldwide. Track your progress and climb to the top!</p>
+					</div>
+					
+					<div class="feature-card">
+						<div class="feature-icon">🎖️</div>
+						<h3 class="feature-title">Achievements</h3>
+						<p class="feature-description">Unlock badges and rewards as you master each game. Showcase your gaming prowess!</p>
+					</div>
+					
+					<div class="feature-card">
+						<div class="feature-icon">📱</div>
+						<h3 class="feature-title">Mobile Ready</h3>
+						<p class="feature-description">Fully responsive design. Play on any device, anywhere, anytime.</p>
+					</div>
+				</div>
+			</section>
+			
+			<!-- CTA Section -->
+			<section class="cta-section">
+				<div class="cta-content">
+					<h2 class="cta-title">Ready to Start Playing?</h2>
+					<p class="cta-text">Join thousands of players enjoying classic arcade games. Create your account to track scores and unlock achievements!</p>
+					<div class="hero-cta">
+						<a href="#" class="cta-button cta-primary" id="signup-btn">
+							<i class="bi bi-person-plus"></i>
+							Create Free Account
+						</a>
+						<a href="#games" class="cta-button cta-secondary">
+							<i class="bi bi-controller"></i>
+							Browse Games
+						</a>
+					</div>
+				</div>
+			</section>
 		</div>
 		<!-- END #content -->
 		
