@@ -51,6 +51,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 140px;
 }
 
 .stat-label {
@@ -68,6 +69,8 @@
   padding: 0;
   box-shadow: none;
   border-radius: 0;
+  min-width: 80px;
+  position: relative;
 }
 
 .stat-value.score-container:after,
@@ -80,15 +83,16 @@
   background: var(--helix-primary) !important;
   color: #000 !important;
   font-weight: 600;
-  padding: 12px 24px !important;
+  padding: 12px 20px !important;
   border-radius: 8px !important;
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(60, 210, 165, 0.3);
   cursor: pointer;
   border: none;
+  white-space: nowrap;
 }
 
 .restart-button:hover {
