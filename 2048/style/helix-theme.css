@@ -380,10 +380,28 @@
   }
 }
 
-/* Score addition animation */
-.score-container .score-addition {
+/* Score addition animation - positioned inline next to score */
+.score-container .score-addition,
+.best-container .score-addition {
+  position: absolute;
   color: var(--helix-primary) !important;
   font-weight: bold;
+  font-size: 1.2rem;
+  margin-left: 8px;
+  opacity: 1;
+  animation: score-pop 1s ease-out;
+  pointer-events: none;
+}
+
+@keyframes score-pop {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 }
 
 /* Smooth tile appearance */
