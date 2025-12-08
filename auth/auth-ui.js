@@ -81,35 +81,65 @@ class AuthUI {
         </div>
       </div>
       
-      <!-- User Menu (shown when logged in) -->
-      <div id="user-menu" class="user-menu" style="display: none;">
-        <div class="user-menu-trigger" onclick="authUI.toggleUserMenu()">
-          <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
-          <span id="user-display-name" class="user-name"></span>
-          <i class="bi bi-chevron-down"></i>
+    `;
+    
+    // Insert modals at end of body
+    document.body.insertAdjacentHTML('beforeend', modalsHTML);
+    
+    // Insert auth controls into header menu
+    this.insertHeaderControls();
+  }
+  
+  // Insert header controls (login button or user menu)
+  insertHeaderControls() {
+    const headerMenu = document.querySelector('#header .menu');
+    if (!headerMenu) return;
+    
+    const authControlsHTML = `
+      <!-- Auth Controls -->
+      <div id="auth-controls" class="auth-controls">
+        <!-- Login/Register Buttons (shown when logged out) -->
+        <div id="auth-buttons" class="auth-buttons">
+          <button class="auth-header-btn auth-header-btn-login" onclick="authUI.openModal('login-modal')">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Login</span>
+          </button>
+          <button class="auth-header-btn auth-header-btn-register" onclick="authUI.openModal('register-modal')">
+            <i class="bi bi-person-plus"></i>
+            <span>Sign Up</span>
+          </button>
         </div>
-        <div id="user-menu-dropdown" class="user-menu-dropdown">
-          <div class="user-menu-item" onclick="authUI.showProfile()">
-            <i class="bi bi-person"></i>
-            Profile
+        
+        <!-- User Menu (shown when logged in) -->
+        <div id="user-menu" class="user-menu" style="display: none;">
+          <div class="user-menu-trigger" onclick="authUI.toggleUserMenu()">
+            <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+            <span id="user-display-name" class="user-name"></span>
+            <i class="bi bi-chevron-down"></i>
           </div>
-          <div class="user-menu-item" onclick="authUI.showAchievements()">
-            <i class="bi bi-trophy"></i>
-            Achievements
-          </div>
-          <div class="user-menu-item" onclick="authUI.showLeaderboards()">
-            <i class="bi bi-bar-chart"></i>
-            Leaderboards
-          </div>
-          <div class="user-menu-item" onclick="authUI.handleLogout()">
-            <i class="bi bi-box-arrow-right"></i>
-            Logout
+          <div id="user-menu-dropdown" class="user-menu-dropdown">
+            <div class="user-menu-item" onclick="authUI.showProfile()">
+              <i class="bi bi-person"></i>
+              Profile
+            </div>
+            <div class="user-menu-item" onclick="authUI.showAchievements()">
+              <i class="bi bi-trophy"></i>
+              Achievements
+            </div>
+            <div class="user-menu-item" onclick="authUI.showLeaderboards()">
+              <i class="bi bi-bar-chart"></i>
+              Leaderboards
+            </div>
+            <div class="user-menu-item" onclick="authUI.handleLogout()">
+              <i class="bi bi-box-arrow-right"></i>
+              Logout
+            </div>
           </div>
         </div>
       </div>
     `;
     
-    document.body.insertAdjacentHTML('beforeend', modalsHTML);
+    headerMenu.innerHTML = authControlsHTML;
   }
   
   // Attach event listeners
@@ -131,6 +161,16 @@ class AuthUI {
         this.openModal('register-modal');
       });
     }
+    
+    // Close user menu dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const userMenu = document.getElementById('user-menu');
+      const dropdown = document.getElementById('user-menu-dropdown');
+      
+      if (userMenu && dropdown && !userMenu.contains(e.target)) {
+        dropdown.classList.remove('active');
+      }
+    });
   }
   
   // Open modal
@@ -221,23 +261,32 @@ class AuthUI {
   updateUIState() {
     const user = window.helixAuth.getCurrentUser();
     const userMenu = document.getElementById('user-menu');
-    const signupBtn = document.getElementById('signup-btn');
+    const authButtons = document.getElementById('auth-buttons');
+    const signupBtn = document.getElementById('signup-btn'); // Homepage button
     
     if (user) {
-      // Show user menu
+      // Show user menu in header
       if (userMenu) {
         userMenu.style.display = 'block';
-        document.getElementById('user-display-name').textContent = user.displayName;
-        document.getElementById('user-avatar').src = user.avatarUrl;
+        const displayNameEl = document.getElementById('user-display-name');
+        const avatarEl = document.getElementById('user-avatar');
+        if (displayNameEl) displayNameEl.textContent = user.displayName;
+        if (avatarEl) avatarEl.src = user.avatarUrl;
       }
       
-      // Hide signup button
+      // Hide auth buttons in header
+      if (authButtons) authButtons.style.display = 'none';
+      
+      // Hide signup button on homepage
       if (signupBtn) signupBtn.style.display = 'none';
     } else {
       // Hide user menu
       if (userMenu) userMenu.style.display = 'none';
       
-      // Show signup button
+      // Show auth buttons in header
+      if (authButtons) authButtons.style.display = 'flex';
+      
+      // Show signup button on homepage
       if (signupBtn) signupBtn.style.display = 'inline-flex';
     }
   }

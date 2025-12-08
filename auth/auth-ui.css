@@ -246,6 +246,61 @@
   text-decoration: underline;
 }
 
+/* Header Auth Controls */
+.auth-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-header-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  white-space: nowrap;
+}
+
+.auth-header-btn i {
+  font-size: 1rem;
+}
+
+.auth-header-btn-login {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-header-btn-login:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.auth-header-btn-register {
+  background: #3cd2a5;
+  color: #000;
+  border: 1px solid #3cd2a5;
+}
+
+.auth-header-btn-register:hover {
+  background: #5ddbb5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(60, 210, 165, 0.3);
+}
+
 /* User Menu (Logged In) */
 .user-menu {
   position: relative;
@@ -332,7 +387,7 @@
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .auth-modal {
     margin: 20px;
     max-width: none;
@@ -342,5 +397,28 @@
   .auth-modal-header,
   .auth-modal-footer {
     padding: 20px;
+  }
+  
+  /* Hide button text on mobile, show icons only */
+  .auth-header-btn span {
+    display: none;
+  }
+  
+  .auth-header-btn {
+    padding: 8px 12px;
+  }
+  
+  .auth-header-btn i {
+    font-size: 1.1rem;
+  }
+  
+  /* Make user menu compact on mobile */
+  .user-name {
+    display: none;
+  }
+  
+  .user-menu-trigger {
+    padding: 6px;
+    gap: 4px;
   }
 }
