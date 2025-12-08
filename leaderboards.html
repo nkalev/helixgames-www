@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Leaderboards | Helix Games</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Helix Games leaderboards - compete with players worldwide" />
+	
+	<!-- CSS -->
+	<link href="assets/css/vendor.min.css" rel="stylesheet" />
+	<link href="assets/css/app.min.css" rel="stylesheet" />
+	<link href="auth/auth-ui.css" rel="stylesheet" />
+	<style>
+		:root {
+			--helix-primary: #3cd2a5;
+			--helix-primary-light: #5ddbb5;
+			--helix-bg-dark: #0a0e10;
+			--helix-bg-card: #1a1f23;
+			--helix-text: #ffffff;
+			--helix-text-muted: rgba(255, 255, 255, 0.6);
+		}
+		
+		.leaderboard-container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 40px 20px;
+		}
+		
+		.page-header {
+			text-align: center;
+			margin-bottom: 50px;
+		}
+		
+		.page-title {
+			font-size: 3rem;
+			font-weight: 800;
+			color: var(--helix-primary);
+			margin-bottom: 15px;
+		}
+		
+		.page-subtitle {
+			font-size: 1.2rem;
+			color: var(--helix-text-muted);
+		}
+		
+		.game-tabs {
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+			justify-content: center;
+			margin-bottom: 40px;
+		}
+		
+		.game-tab {
+			padding: 12px 24px;
+			background: rgba(60, 210, 165, 0.1);
+			border: 1px solid rgba(60, 210, 165, 0.3);
+			border-radius: 8px;
+			color: var(--helix-text);
+			cursor: pointer;
+			transition: all 0.3s ease;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-weight: 500;
+		}
+		
+		.game-tab:hover {
+			background: rgba(60, 210, 165, 0.2);
+			border-color: var(--helix-primary);
+		}
+		
+		.game-tab.active {
+			background: var(--helix-primary);
+			color: #000;
+			border-color: var(--helix-primary);
+		}
+		
+		.game-tab-icon {
+			font-size: 1.5rem;
+		}
+		
+		.leaderboard-card {
+			background: var(--helix-bg-card);
+			border-radius: 16px;
+			padding: 30px;
+			border: 1px solid rgba(60, 210, 165, 0.2);
+		}
+		
+		.leaderboard-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+			padding-bottom: 20px;
+			border-bottom: 1px solid rgba(60, 210, 165, 0.2);
+		}
+		
+		.leaderboard-title {
+			font-size: 2rem;
+			font-weight: 700;
+			color: var(--helix-text);
+			display: flex;
+			align-items: center;
+			gap: 15px;
+		}
+		
+		.leaderboard-title-icon {
+			font-size: 2.5rem;
+		}
+		
+		.leaderboard-count {
+			color: var(--helix-text-muted);
+			font-size: 0.9rem;
+		}
+		
+		.leaderboard-table {
+			width: 100%;
+		}
+		
+		.leaderboard-row {
+			display: grid;
+			grid-template-columns: 80px 1fr 150px 150px;
+			gap: 20px;
+			align-items: center;
+			padding: 20px;
+			margin-bottom: 10px;
+			background: rgba(60, 210, 165, 0.05);
+			border-radius: 12px;
+			border: 1px solid rgba(60, 210, 165, 0.1);
+			transition: all 0.3s ease;
+		}
+		
+		.leaderboard-row:hover {
+			background: rgba(60, 210, 165, 0.1);
+			border-color: var(--helix-primary);
+			transform: translateX(5px);
+		}
+		
+		.leaderboard-rank {
+			font-size: 1.8rem;
+			font-weight: 800;
+			color: var(--helix-primary);
+			text-align: center;
+		}
+		
+		.rank-1 { color: #FFD700; }
+		.rank-2 { color: #C0C0C0; }
+		.rank-3 { color: #CD7F32; }
+		
+		.rank-medal {
+			font-size: 2.5rem;
+		}
+		
+		.leaderboard-player {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+		}
+		
+		.player-avatar {
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			border: 2px solid var(--helix-primary);
+		}
+		
+		.player-name {
+			font-size: 1.2rem;
+			font-weight: 600;
+			color: var(--helix-text);
+		}
+		
+		.leaderboard-score {
+			font-size: 1.8rem;
+			font-weight: 700;
+			color: var(--helix-primary);
+			text-align: right;
+		}
+		
+		.leaderboard-meta {
+			text-align: right;
+			color: var(--helix-text-muted);
+			font-size: 0.9rem;
+		}
+		
+		.no-scores {
+			text-align: center;
+			padding: 60px 20px;
+			color: var(--helix-text-muted);
+		}
+		
+		.no-scores-icon {
+			font-size: 4rem;
+			margin-bottom: 20px;
+			opacity: 0.5;
+		}
+		
+		.current-user-row {
+			background: rgba(60, 210, 165, 0.15);
+			border-color: var(--helix-primary);
+		}
+		
+		@media (max-width: 768px) {
+			.leaderboard-row {
+				grid-template-columns: 60px 1fr;
+				gap: 15px;
+			}
+			
+			.leaderboard-score,
+			.leaderboard-meta {
+				grid-column: 2;
+				text-align: left;
+			}
+			
+			.page-title {
+				font-size: 2rem;
+			}
+			
+			.game-tabs {
+				flex-direction: column;
+			}
+			
+			.game-tab {
+				justify-content: center;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="app" class="app">
+		<!-- Header -->
+		<div id="header" class="app-header">
+			<div class="mobile-toggler">
+				<button type="button" class="menu-toggler" data-toggle-class="app-sidebar-mobile-toggled" data-toggle-target=".app">
+					<span class="bar"></span>
+					<span class="bar"></span>
+					<span class="bar"></span>
+				</button>
+			</div>
+			
+			<div class="brand">
+				<a href="index.html" class="brand-logo">
+					<span class="brand-img">
+						<span class="brand-img-text text-theme">H</span>
+					</span>
+					<span class="brand-text">HELIX GAMES</span>
+				</a>
+			</div>
+		</div>
+		
+		<!-- Sidebar -->
+		<div id="sidebar" class="app-sidebar">
+			<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
+				<div class="menu">
+					<div class="menu-header">Navigation</div>
+					<div class="menu-item">
+						<a href="index.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-house-door"></i></span>
+							<span class="menu-text">Home</span>
+						</a>
+					</div>
+					<div class="menu-item">
+						<a href="profile.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-person"></i></span>
+							<span class="menu-text">Profile</span>
+						</a>
+					</div>
+					<div class="menu-item active">
+						<a href="leaderboards.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-bar-chart"></i></span>
+							<span class="menu-text">Leaderboards</span>
+						</a>
+					</div>
+					<div class="menu-item">
+						<a href="achievements.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-trophy"></i></span>
+							<span class="menu-text">Achievements</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<button class="app-sidebar-mobile-backdrop" data-toggle-target=".app" data-toggle-class="app-sidebar-mobile-toggled"></button>
+		
+		<!-- Content -->
+		<div id="content" class="app-content">
+			<div class="leaderboard-container">
+				<!-- Page Header -->
+				<div class="page-header">
+					<h1 class="page-title">🏆 Leaderboards</h1>
+					<p class="page-subtitle">Compete with the best players worldwide</p>
+				</div>
+				
+				<!-- Game Tabs -->
+				<div class="game-tabs" id="game-tabs">
+					<!-- Populated by JavaScript -->
+				</div>
+				
+				<!-- Leaderboard Card -->
+				<div class="leaderboard-card" id="leaderboard-content">
+					<!-- Populated by JavaScript -->
+				</div>
+			</div>
+		</div>
+		
+		<a href="#" data-toggle="scroll-to-top" class="btn-scroll-top fade"><i class="fa fa-arrow-up"></i></a>
+	</div>
+	
+	<!-- Scripts -->
+	<script src="assets/js/vendor.min.js"></script>
+	<script src="assets/js/app.min.js"></script>
+	<script src="auth/auth.js"></script>
+	<script src="auth/auth-ui.js"></script>
+	
+	<script>
+		// Leaderboard logic
+		const games = [
+			{ id: '2048', name: '2048', icon: '🎯' },
+			{ id: 'asteroids', name: 'Asteroids', icon: '🚀' },
+			{ id: 'invasion', name: 'Alien Invasion', icon: '👾' },
+			{ id: 'lode-runner', name: 'Lode Runner', icon: '🏃' },
+			{ id: 'pacman', name: 'Pac-Man', icon: '🟡' },
+			{ id: 'space-invaders', name: 'Space Invaders', icon: '🛸' },
+			{ id: 'tetris', name: 'Tetris', icon: '🧩' }
+		];
+		
+		let currentGame = '2048';
+		
+		function renderTabs() {
+			const tabsContainer = document.getElementById('game-tabs');
+			tabsContainer.innerHTML = games.map(game => `
+				<button class="game-tab ${game.id === currentGame ? 'active' : ''}" 
+						onclick="switchGame('${game.id}')">
+					<span class="game-tab-icon">${game.icon}</span>
+					<span>${game.name}</span>
+				</button>
+			`).join('');
+		}
+		
+		function switchGame(gameId) {
+			currentGame = gameId;
+			renderTabs();
+			renderLeaderboard();
+		}
+		
+		function renderLeaderboard() {
+			const game = games.find(g => g.id === currentGame);
+			const leaderboard = window.helixAuth.getLeaderboard(currentGame, 50);
+			const currentUser = window.helixAuth.getCurrentUser();
+			const content = document.getElementById('leaderboard-content');
+			
+			const header = `
+				<div class="leaderboard-header">
+					<div class="leaderboard-title">
+						<span class="leaderboard-title-icon">${game.icon}</span>
+						<span>${game.name}</span>
+					</div>
+					<div class="leaderboard-count">${leaderboard.length} players</div>
+				</div>
+			`;
+			
+			if (leaderboard.length === 0) {
+				content.innerHTML = header + `
+					<div class="no-scores">
+						<div class="no-scores-icon">🏆</div>
+						<p>No scores yet for this game.</p>
+						<p>Be the first to set a record!</p>
+					</div>
+				`;
+				return;
+			}
+			
+			const getMedalIcon = (rank) => {
+				if (rank === 1) return '🥇';
+				if (rank === 2) return '🥈';
+				if (rank === 3) return '🥉';
+				return '';
+			};
+			
+			const rows = leaderboard.map((entry, index) => {
+				const rank = index + 1;
+				const isCurrentUser = currentUser && entry.username === currentUser.username;
+				const rankClass = rank <= 3 ? `rank-${rank}` : '';
+				const medal = getMedalIcon(rank);
+				
+				return `
+					<div class="leaderboard-row ${isCurrentUser ? 'current-user-row' : ''}">
+						<div class="leaderboard-rank ${rankClass}">
+							${medal || rank}
+						</div>
+						<div class="leaderboard-player">
+							<div class="player-name">
+								${entry.username}
+								${isCurrentUser ? '<i class="bi bi-star-fill" style="color: var(--helix-primary);"></i>' : ''}
+							</div>
+						</div>
+						<div class="leaderboard-score">${entry.score.toLocaleString()}</div>
+						<div class="leaderboard-meta">
+							${entry.level ? `Level ${entry.level}<br>` : ''}
+							${new Date(entry.achievedAt).toLocaleDateString()}
+						</div>
+					</div>
+				`;
+			}).join('');
+			
+			content.innerHTML = header + '<div class="leaderboard-table">' + rows + '</div>';
+		}
+		
+		document.addEventListener('DOMContentLoaded', () => {
+			renderTabs();
+			renderLeaderboard();
+		});
+	</script>
+</body>
+</html>

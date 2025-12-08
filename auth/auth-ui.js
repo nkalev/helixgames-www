@@ -287,22 +287,22 @@ class AuthUI {
     }, 3000);
   }
   
-  // Show profile page (placeholder)
+  // Show profile page
   showProfile() {
     this.toggleUserMenu();
-    alert('Profile page coming soon!');
+    window.location.href = 'profile.html';
   }
   
-  // Show achievements (placeholder)
+  // Show achievements
   showAchievements() {
     this.toggleUserMenu();
-    alert('Achievements page coming soon!');
+    window.location.href = 'achievements.html';
   }
   
-  // Show leaderboards (placeholder)
+  // Show leaderboards
   showLeaderboards() {
     this.toggleUserMenu();
-    alert('Leaderboards page coming soon!');
+    window.location.href = 'leaderboards.html';
   }
 }
 

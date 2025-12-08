@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Achievements | Helix Games</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Unlock achievements and earn rewards in Helix Games" />
+	
+	<!-- CSS -->
+	<link href="assets/css/vendor.min.css" rel="stylesheet" />
+	<link href="assets/css/app.min.css" rel="stylesheet" />
+	<link href="auth/auth-ui.css" rel="stylesheet" />
+	<style>
+		:root {
+			--helix-primary: #3cd2a5;
+			--helix-primary-light: #5ddbb5;
+			--helix-bg-dark: #0a0e10;
+			--helix-bg-card: #1a1f23;
+			--helix-text: #ffffff;
+			--helix-text-muted: rgba(255, 255, 255, 0.6);
+		}
+		
+		.achievements-container {
+			max-width: 1400px;
+			margin: 0 auto;
+			padding: 40px 20px;
+		}
+		
+		.page-header {
+			text-align: center;
+			margin-bottom: 50px;
+		}
+		
+		.page-title {
+			font-size: 3rem;
+			font-weight: 800;
+			color: var(--helix-primary);
+			margin-bottom: 15px;
+		}
+		
+		.page-subtitle {
+			font-size: 1.2rem;
+			color: var(--helix-text-muted);
+		}
+		
+		.progress-stats {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 20px;
+			margin-bottom: 40px;
+		}
+		
+		.progress-card {
+			background: var(--helix-bg-card);
+			border-radius: 12px;
+			padding: 25px;
+			border: 1px solid rgba(60, 210, 165, 0.2);
+			text-align: center;
+		}
+		
+		.progress-value {
+			font-size: 2.5rem;
+			font-weight: 800;
+			color: var(--helix-primary);
+			display: block;
+			margin-bottom: 8px;
+		}
+		
+		.progress-label {
+			color: var(--helix-text-muted);
+			font-size: 0.9rem;
+		}
+		
+		.filter-tabs {
+			display: flex;
+			gap: 10px;
+			margin-bottom: 30px;
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+		
+		.filter-tab {
+			padding: 10px 20px;
+			background: rgba(60, 210, 165, 0.1);
+			border: 1px solid rgba(60, 210, 165, 0.3);
+			border-radius: 8px;
+			color: var(--helix-text);
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-weight: 500;
+		}
+		
+		.filter-tab:hover {
+			background: rgba(60, 210, 165, 0.2);
+		}
+		
+		.filter-tab.active {
+			background: var(--helix-primary);
+			color: #000;
+		}
+		
+		.achievements-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: 25px;
+			margin-bottom: 40px;
+		}
+		
+		.achievement-card {
+			background: var(--helix-bg-card);
+			border-radius: 16px;
+			padding: 30px;
+			border: 1px solid rgba(60, 210, 165, 0.2);
+			transition: all 0.3s ease;
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.achievement-card:hover {
+			transform: translateY(-5px);
+			border-color: var(--helix-primary);
+			box-shadow: 0 10px 30px rgba(60, 210, 165, 0.2);
+		}
+		
+		.achievement-card.locked {
+			opacity: 0.5;
+		}
+		
+		.achievement-card.unlocked::before {
+			content: '✓';
+			position: absolute;
+			top: 15px;
+			right: 15px;
+			width: 30px;
+			height: 30px;
+			background: var(--helix-primary);
+			color: #000;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 800;
+			font-size: 1.2rem;
+		}
+		
+		.achievement-icon {
+			font-size: 4rem;
+			margin-bottom: 20px;
+			text-align: center;
+		}
+		
+		.achievement-title {
+			font-size: 1.4rem;
+			font-weight: 700;
+			color: var(--helix-text);
+			margin-bottom: 10px;
+		}
+		
+		.achievement-description {
+			color: var(--helix-text-muted);
+			line-height: 1.6;
+			margin-bottom: 15px;
+		}
+		
+		.achievement-footer {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-top: 15px;
+			border-top: 1px solid rgba(60, 210, 165, 0.1);
+		}
+		
+		.achievement-points {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+			color: var(--helix-primary);
+			font-weight: 600;
+		}
+		
+		.achievement-rarity {
+			padding: 4px 12px;
+			border-radius: 12px;
+			font-size: 0.8rem;
+			font-weight: 600;
+			text-transform: uppercase;
+		}
+		
+		.rarity-common {
+			background: rgba(100, 100, 100, 0.2);
+			color: #999;
+		}
+		
+		.rarity-rare {
+			background: rgba(0, 112, 221, 0.2);
+			color: #0070dd;
+		}
+		
+		.rarity-epic {
+			background: rgba(163, 53, 238, 0.2);
+			color: #a335ee;
+		}
+		
+		.rarity-legendary {
+			background: rgba(255, 128, 0, 0.2);
+			color: #ff8000;
+		}
+		
+		.achievement-date {
+			text-align: center;
+			color: var(--helix-text-muted);
+			font-size: 0.85rem;
+			margin-top: 10px;
+		}
+		
+		.no-achievements {
+			text-align: center;
+			padding: 80px 20px;
+			color: var(--helix-text-muted);
+		}
+		
+		.no-achievements-icon {
+			font-size: 5rem;
+			margin-bottom: 20px;
+			opacity: 0.5;
+		}
+		
+		@media (max-width: 768px) {
+			.page-title {
+				font-size: 2rem;
+			}
+			
+			.achievements-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="app" class="app">
+		<!-- Header -->
+		<div id="header" class="app-header">
+			<div class="mobile-toggler">
+				<button type="button" class="menu-toggler" data-toggle-class="app-sidebar-mobile-toggled" data-toggle-target=".app">
+					<span class="bar"></span>
+					<span class="bar"></span>
+					<span class="bar"></span>
+				</button>
+			</div>
+			
+			<div class="brand">
+				<a href="index.html" class="brand-logo">
+					<span class="brand-img">
+						<span class="brand-img-text text-theme">H</span>
+					</span>
+					<span class="brand-text">HELIX GAMES</span>
+				</a>
+			</div>
+		</div>
+		
+		<!-- Sidebar -->
+		<div id="sidebar" class="app-sidebar">
+			<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
+				<div class="menu">
+					<div class="menu-header">Navigation</div>
+					<div class="menu-item">
+						<a href="index.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-house-door"></i></span>
+							<span class="menu-text">Home</span>
+						</a>
+					</div>
+					<div class="menu-item">
+						<a href="profile.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-person"></i></span>
+							<span class="menu-text">Profile</span>
+						</a>
+					</div>
+					<div class="menu-item">
+						<a href="leaderboards.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-bar-chart"></i></span>
+							<span class="menu-text">Leaderboards</span>
+						</a>
+					</div>
+					<div class="menu-item active">
+						<a href="achievements.html" class="menu-link">
+							<span class="menu-icon"><i class="bi bi-trophy"></i></span>
+							<span class="menu-text">Achievements</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<button class="app-sidebar-mobile-backdrop" data-toggle-target=".app" data-toggle-class="app-sidebar-mobile-toggled"></button>
+		
+		<!-- Content -->
+		<div id="content" class="app-content">
+			<div class="achievements-container">
+				<!-- Page Header -->
+				<div class="page-header">
+					<h1 class="page-title">🏆 Achievements</h1>
+					<p class="page-subtitle">Unlock badges and earn rewards as you master the games</p>
+				</div>
+				
+				<!-- Progress Stats -->
+				<div class="progress-stats" id="progress-stats">
+					<!-- Populated by JavaScript -->
+				</div>
+				
+				<!-- Filters -->
+				<div class="filter-tabs" id="filter-tabs">
+					<button class="filter-tab active" onclick="filterAchievements('all')">All</button>
+					<button class="filter-tab" onclick="filterAchievements('unlocked')">Unlocked</button>
+					<button class="filter-tab" onclick="filterAchievements('locked')">Locked</button>
+				</div>
+				
+				<!-- Achievements Grid -->
+				<div class="achievements-grid" id="achievements-grid">
+					<!-- Populated by JavaScript -->
+				</div>
+			</div>
+		</div>
+		
+		<a href="#" data-toggle="scroll-to-top" class="btn-scroll-top fade"><i class="fa fa-arrow-up"></i></a>
+	</div>
+	
+	<!-- Scripts -->
+	<script src="assets/js/vendor.min.js"></script>
+	<script src="assets/js/app.min.js"></script>
+	<script src="auth/auth.js"></script>
+	<script src="auth/auth-ui.js"></script>
+	
+	<script>
+		// All available achievements
+		const allAchievements = [
+			// Global Achievements
+			{
+				key: 'first_game',
+				title: 'First Steps',
+				description: 'Play your first game on Helix Games',
+				icon: '🎮',
+				points: 10,
+				rarity: 'common'
+			},
+			{
+				key: 'dedicated_player',
+				title: 'Dedicated Player',
+				description: 'Play 10 games across all titles',
+				icon: '🏃',
+				points: 25,
+				rarity: 'common'
+			},
+			{
+				key: 'achievement_hunter',
+				title: 'Achievement Hunter',
+				description: 'Unlock 5 achievements',
+				icon: '🎯',
+				points: 50,
+				rarity: 'rare'
+			},
+			
+			// Score Milestones (Generic)
+			{
+				key: 'score_1000',
+				title: '1000 Club',
+				description: 'Score 1000+ points in any game',
+				icon: '🌟',
+				points: 50,
+				rarity: 'common'
+			},
+			{
+				key: 'score_5000',
+				title: '5000 Master',
+				description: 'Score 5000+ points in any game',
+				icon: '⭐',
+				points: 100,
+				rarity: 'rare'
+			},
+			{
+				key: 'score_10000',
+				title: 'Elite Gamer',
+				description: 'Score 10000+ points in any game',
+				icon: '💫',
+				points: 200,
+				rarity: 'epic'
+			},
+			
+			// Tetris
+			{
+				key: 'tetris_line_clearer',
+				title: 'Line Clearer',
+				description: 'Clear 100 lines in Tetris',
+				icon: '📏',
+				points: 30,
+				rarity: 'common'
+			},
+			{
+				key: 'tetris_speed_demon',
+				title: 'Speed Demon',
+				description: 'Reach level 10 in Tetris',
+				icon: '⚡',
+				points: 75,
+				rarity: 'rare'
+			},
+			
+			// Pac-Man
+			{
+				key: 'pacman_dot_collector',
+				title: 'Dot Collector',
+				description: 'Eat 1000 dots in Pac-Man',
+				icon: '🔵',
+				points: 30,
+				rarity: 'common'
+			},
+			{
+				key: 'pacman_ghost_hunter',
+				title: 'Ghost Hunter',
+				description: 'Eat 50 ghosts in Pac-Man',
+				icon: '👻',
+				points: 50,
+				rarity: 'rare'
+			},
+			
+			// Space Invaders
+			{
+				key: 'invaders_sharpshooter',
+				title: 'Sharpshooter',
+				description: 'Achieve 90% accuracy in Space Invaders',
+				icon: '🎯',
+				points: 60,
+				rarity: 'rare'
+			},
+			{
+				key: 'invaders_wave_clear',
+				title: 'Wave Clear',
+				description: 'Clear 10 waves in Space Invaders',
+				icon: '🌊',
+				points: 40,
+				rarity: 'common'
+			},
+			
+			// 2048
+			{
+				key: '2048_128_tile',
+				title: '128 Achiever',
+				description: 'Create a 128 tile in 2048',
+				icon: '🎲',
+				points: 25,
+				rarity: 'common'
+			},
+			{
+				key: '2048_winner',
+				title: '2048 Champion',
+				description: 'Reach the 2048 tile',
+				icon: '🏆',
+				points: 150,
+				rarity: 'epic'
+			},
+			
+			// Asteroids
+			{
+				key: 'asteroids_survivor',
+				title: 'Space Survivor',
+				description: 'Survive 5 minutes in Asteroids',
+				icon: '🛸',
+				points: 50,
+				rarity: 'rare'
+			},
+			
+			// Lode Runner
+			{
+				key: 'lode_gold_rush',
+				title: 'Gold Rush',
+				description: 'Collect 100 gold pieces in Lode Runner',
+				icon: '💰',
+				points: 40,
+				rarity: 'common'
+			},
+			{
+				key: 'lode_master_digger',
+				title: 'Master Digger',
+				description: 'Complete 10 levels in Lode Runner',
+				icon: '⛏️',
+				points: 75,
+				rarity: 'rare'
+			},
+			
+			// Legendary
+			{
+				key: 'completionist',
+				title: 'Completionist',
+				description: 'Unlock all achievements',
+				icon: '👑',
+				points: 500,
+				rarity: 'legendary'
+			}
+		];
+		
+		let currentFilter = 'all';
+		
+		function filterAchievements(filter) {
+			currentFilter = filter;
+			
+			// Update active tab
+			document.querySelectorAll('.filter-tab').forEach(tab => {
+				tab.classList.remove('active');
+			});
+			event.target.classList.add('active');
+			
+			renderAchievements();
+		}
+		
+		function renderProgressStats() {
+			const userAchievements = window.helixAuth.getAchievements();
+			const unlockedCount = Object.keys(userAchievements).length;
+			const totalCount = allAchievements.length;
+			const totalPoints = Object.values(userAchievements).reduce((sum, ach) => sum + (ach.points || 0), 0);
+			const percentage = Math.round((unlockedCount / totalCount) * 100);
+			
+			const statsHTML = `
+				<div class="progress-card">
+					<span class="progress-value">${unlockedCount}/${totalCount}</span>
+					<span class="progress-label">Unlocked</span>
+				</div>
+				<div class="progress-card">
+					<span class="progress-value">${percentage}%</span>
+					<span class="progress-label">Completion</span>
+				</div>
+				<div class="progress-card">
+					<span class="progress-value">${totalPoints}</span>
+					<span class="progress-label">Total Points</span>
+				</div>
+			`;
+			
+			document.getElementById('progress-stats').innerHTML = statsHTML;
+		}
+		
+		function renderAchievements() {
+			const userAchievements = window.helixAuth.getAchievements();
+			const grid = document.getElementById('achievements-grid');
+			
+			let filteredAchievements = allAchievements;
+			
+			if (currentFilter === 'unlocked') {
+				filteredAchievements = allAchievements.filter(ach => userAchievements[ach.key]);
+			} else if (currentFilter === 'locked') {
+				filteredAchievements = allAchievements.filter(ach => !userAchievements[ach.key]);
+			}
+			
+			if (filteredAchievements.length === 0) {
+				grid.innerHTML = `
+					<div class="no-achievements" style="grid-column: 1 / -1;">
+						<div class="no-achievements-icon">🏆</div>
+						<p>No achievements found in this category.</p>
+					</div>
+				`;
+				return;
+			}
+			
+			grid.innerHTML = filteredAchievements.map(ach => {
+				const isUnlocked = userAchievements[ach.key];
+				const unlockDate = isUnlocked ? new Date(isUnlocked.unlockedAt).toLocaleDateString() : null;
+				
+				return `
+					<div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
+						<div class="achievement-icon">${ach.icon}</div>
+						<div class="achievement-title">${ach.title}</div>
+						<div class="achievement-description">${ach.description}</div>
+						<div class="achievement-footer">
+							<div class="achievement-points">
+								<i class="bi bi-star-fill"></i>
+								${ach.points} pts
+							</div>
+							<div class="achievement-rarity rarity-${ach.rarity}">
+								${ach.rarity}
+							</div>
+						</div>
+						${unlockDate ? `<div class="achievement-date">Unlocked on ${unlockDate}</div>` : ''}
+					</div>
+				`;
+			}).join('');
+		}
+		
+		document.addEventListener('DOMContentLoaded', () => {
+			renderProgressStats();
+			renderAchievements();
+		});
+	</script>
+</body>
+</html>
