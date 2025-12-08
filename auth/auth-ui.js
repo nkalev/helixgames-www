@@ -96,6 +96,46 @@ class AuthUI {
     if (!headerMenu) return;
     
     const authControlsHTML = `
+      <!-- Games Dropdown Menu -->
+      <div class="games-dropdown">
+        <button class="games-dropdown-trigger" onclick="authUI.toggleGamesMenu()">
+          <i class="bi bi-joystick"></i>
+          <span>Games</span>
+          <i class="bi bi-chevron-down"></i>
+        </button>
+        <div id="games-dropdown-menu" class="games-dropdown-menu">
+          <div class="games-menu-header">Choose a Game</div>
+          <a href="2048/index.html" class="games-menu-item">
+            <i class="bi bi-grid-3x3"></i>
+            <span>2048</span>
+          </a>
+          <a href="asteroids/index.html" class="games-menu-item">
+            <i class="bi bi-rocket"></i>
+            <span>Asteroids</span>
+          </a>
+          <a href="invasion/index.html" class="games-menu-item">
+            <i class="bi bi-alien"></i>
+            <span>Alien Invasion</span>
+          </a>
+          <a href="lode-runner/index.html" class="games-menu-item">
+            <i class="bi bi-ladder"></i>
+            <span>Lode Runner</span>
+          </a>
+          <a href="pacman/index.html" class="games-menu-item">
+            <i class="bi bi-circle"></i>
+            <span>Pac-Man</span>
+          </a>
+          <a href="space-invaders/index.html" class="games-menu-item">
+            <i class="bi bi-airplane"></i>
+            <span>Space Invaders</span>
+          </a>
+          <a href="tetris/index.html" class="games-menu-item">
+            <i class="bi bi-square"></i>
+            <span>Tetris</span>
+          </a>
+        </div>
+      </div>
+      
       <!-- Auth Controls -->
       <div id="auth-controls" class="auth-controls">
         <!-- Login/Register Buttons (shown when logged out) -->
@@ -169,6 +209,14 @@ class AuthUI {
       
       if (userMenu && dropdown && !userMenu.contains(e.target)) {
         dropdown.classList.remove('active');
+      }
+      
+      // Close games menu when clicking outside
+      const gamesDropdown = document.querySelector('.games-dropdown');
+      const gamesMenu = document.getElementById('games-dropdown-menu');
+      
+      if (gamesDropdown && gamesMenu && !gamesDropdown.contains(e.target)) {
+        gamesMenu.classList.remove('active');
       }
     });
   }
@@ -294,6 +342,14 @@ class AuthUI {
   // Toggle user menu dropdown
   toggleUserMenu() {
     const dropdown = document.getElementById('user-menu-dropdown');
+    if (dropdown) {
+      dropdown.classList.toggle('active');
+    }
+  }
+  
+  // Toggle games menu dropdown
+  toggleGamesMenu() {
+    const dropdown = document.getElementById('games-dropdown-menu');
     if (dropdown) {
       dropdown.classList.toggle('active');
     }
