@@ -205,6 +205,16 @@ class AuthUI {
     this.updateUIState();
     this.toggleUserMenu();
     this.showNotification('You have been logged out', 'info');
+    
+    // Redirect to homepage if on protected page
+    const protectedPages = ['profile.html', 'achievements.html', 'leaderboards.html'];
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    if (protectedPages.includes(currentPage)) {
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
+    }
   }
   
   // Update UI based on auth state
