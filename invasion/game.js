@@ -207,6 +207,17 @@ var winGame = function() {
 };
 
 var loseGame = function() {
+  // Submit score before showing game over screen
+  if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+    const result = window.helixAuth.submitScore('invasion', Game.points);
+    
+    if (result.success && result.isPersonalBest) {
+      setTimeout(() => {
+        console.log('🎉 New Personal Best!', Game.points);
+      }, 100);
+    }
+  }
+  
   Game.setBoard(3,new TitleScreen("You lose!", 
                                   "Press fire to play again",
                                   playGame));

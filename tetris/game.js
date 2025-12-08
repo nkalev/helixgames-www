@@ -70,6 +70,7 @@ class Tetris {
     
     if (this.collides()) {
       this.gameOver = true;
+      this.submitScore();
     }
   }
   
@@ -340,6 +341,20 @@ class Tetris {
     this.updateStats();
     this.spawnPiece();
     this.spawnNextPiece();
+  }
+  
+  submitScore() {
+    // Check if auth system is available and user is logged in
+    if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+      const result = window.helixAuth.submitScore('tetris', this.score, this.level);
+      
+      if (result.success && result.isPersonalBest) {
+        // Show personal best notification
+        setTimeout(() => {
+          console.log('🎉 New Personal Best!', this.score);
+        }, 100);
+      }
+    }
   }
   
   update(time = 0) {

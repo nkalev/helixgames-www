@@ -315,6 +315,7 @@ class Game {
         this.lives--;
         if (this.lives <= 0) {
           this.state = STATE_GAME_OVER;
+          this.submitScore();
         } else {
           this.resetPositions();
           this.state = STATE_READY;
@@ -540,6 +541,20 @@ class Game {
     this.state = STATE_READY;
     this.stateTimer = 0;
     this.updateStats();
+  }
+  
+  submitScore() {
+    // Check if auth system is available and user is logged in
+    if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+      const result = window.helixAuth.submitScore('pacman', this.score, this.level);
+      
+      if (result.success && result.isPersonalBest) {
+        // Show personal best notification
+        setTimeout(() => {
+          console.log('🎉 New Personal Best!', this.score);
+        }, 100);
+      }
+    }
   }
   
   run() {

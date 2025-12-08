@@ -1013,6 +1013,7 @@ Game = {
     player_died: function () {
       if (Game.lives < 0) {
         this.state = 'end_game';
+        Game.submitScore();
       } else {
         if (this.timer == null) {
           this.timer = Date.now();
@@ -1042,6 +1043,20 @@ Game = {
       this[this.state]();
     },
     state: 'boot'
+  },
+  
+  submitScore: function () {
+    // Check if auth system is available and user is logged in
+    if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+      const result = window.helixAuth.submitScore('asteroids', this.score);
+      
+      if (result.success && result.isPersonalBest) {
+        // Show personal best notification
+        setTimeout(() => {
+          console.log('🎉 New Personal Best!', this.score);
+        }, 100);
+      }
+    }
   }
 
 };

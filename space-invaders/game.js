@@ -152,6 +152,20 @@ class Game {
     this.initLevel();
   }
   
+  submitScore() {
+    // Check if auth system is available and user is logged in
+    if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+      const result = window.helixAuth.submitScore('space-invaders', this.score, this.level);
+      
+      if (result.success && result.isPersonalBest) {
+        // Show personal best notification
+        setTimeout(() => {
+          console.log('🎉 New Personal Best!', this.score);
+        }, 100);
+      }
+    }
+  }
+  
   update() {
     if (this.state !== 'playing') return;
     
@@ -297,6 +311,7 @@ class Game {
       if (a.y > this.player.y - 20) {
         this.lives = 0;
         this.state = 'gameover';
+        this.submitScore();
       }
     });
     
@@ -368,6 +383,7 @@ class Game {
     
     if (this.lives <= 0) {
       this.state = 'gameover';
+      this.submitScore();
       audioManager.gameOver(); // Sound effect
     }
   }

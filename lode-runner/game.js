@@ -481,6 +481,7 @@ class LodeRunnerGame {
     
     if (this.lives <= 0) {
       this.gameOver = true;
+      this.submitScore();
     } else {
       // Reset positions
       this.player.x = 1;
@@ -608,6 +609,20 @@ class LodeRunnerGame {
       this.ctx.font = 'bold 36px Arial';
       this.ctx.textAlign = 'center';
       this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2);
+    }
+  }
+  
+  submitScore() {
+    // Check if auth system is available and user is logged in
+    if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+      const result = window.helixAuth.submitScore('lode-runner', this.score, this.level);
+      
+      if (result.success && result.isPersonalBest) {
+        // Show personal best notification
+        setTimeout(() => {
+          console.log('🎉 New Personal Best!', this.score);
+        }, 100);
+      }
     }
   }
 }

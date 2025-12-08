@@ -184,6 +184,7 @@ GameManager.prototype.move = function (direction) {
 
     if (!this.movesAvailable()) {
       this.over = true; // Game over!
+      this.submitScore();
     }
 
     this.actuate();
@@ -269,4 +270,18 @@ GameManager.prototype.tileMatchesAvailable = function () {
 
 GameManager.prototype.positionsEqual = function (first, second) {
   return first.x === second.x && first.y === second.y;
+};
+
+GameManager.prototype.submitScore = function () {
+  // Check if auth system is available and user is logged in
+  if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+    const result = window.helixAuth.submitScore('2048', this.score);
+    
+    if (result.success && result.isPersonalBest) {
+      // Show personal best notification
+      setTimeout(() => {
+        console.log('🎉 New Personal Best!', this.score);
+      }, 100);
+    }
+  }
 };
