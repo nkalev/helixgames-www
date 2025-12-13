@@ -1,5 +1,23 @@
 // Helix Games - Authentication UI Components
 
+// Global function to toggle games dropdown
+function toggleGamesDropdown() {
+  const dropdown = document.getElementById('games-dropdown-menu');
+  if (dropdown) {
+    dropdown.classList.toggle('active');
+  }
+}
+
+// Close games dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const gamesDropdown = document.querySelector('.games-dropdown');
+  const gamesMenu = document.getElementById('games-dropdown-menu');
+  
+  if (gamesDropdown && gamesMenu && !gamesDropdown.contains(e.target)) {
+    gamesMenu.classList.remove('active');
+  }
+});
+
 class AuthUI {
   constructor() {
     this.createModals();

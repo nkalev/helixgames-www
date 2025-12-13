@@ -27,25 +27,46 @@
 	<div id="app" class="app">
 		<!-- BEGIN #header -->
 		<div id="header" class="app-header">
-			<!-- BEGIN desktop-toggler -->
-			<div class="desktop-toggler">
-				<button type="button" class="menu-toggler" data-toggle-class="app-sidebar-collapsed" data-dismiss-class="app-sidebar-toggled" data-toggle-target=".app">
+			<!-- BEGIN games-dropdown -->
+			<div class="games-dropdown">
+				<button type="button" class="menu-toggler" onclick="toggleGamesDropdown()">
 					<span class="bar"></span>
 					<span class="bar"></span>
 					<span class="bar"></span>
 				</button>
+				<div id="games-dropdown-menu" class="games-dropdown-menu">
+					<div class="games-menu-header">Games</div>
+					<a href="../2048/index.html" class="games-menu-item">
+						<i class="bi bi-grid-3x3"></i>
+						<span>2048</span>
+					</a>
+					<a href="../asteroids/index.html" class="games-menu-item">
+						<i class="bi bi-rocket"></i>
+						<span>Asteroids</span>
+					</a>
+					<a href="../invasion/index.html" class="games-menu-item">
+						<i class="bi bi-bug"></i>
+						<span>Alien Invasion</span>
+					</a>
+					<a href="../lode-runner/index.html" class="games-menu-item">
+						<i class="bi bi-ladder"></i>
+						<span>Lode Runner</span>
+					</a>
+					<a href="../pacman/index.html" class="games-menu-item">
+						<i class="bi bi-circle-fill"></i>
+						<span>Pac-Man</span>
+					</a>
+					<a href="../space-invaders/index.html" class="games-menu-item">
+						<i class="bi bi-rocket-takeoff"></i>
+						<span>Space Invaders</span>
+					</a>
+					<a href="index.html" class="games-menu-item">
+						<i class="bi bi-boxes"></i>
+						<span>Tetris</span>
+					</a>
+				</div>
 			</div>
-			<!-- BEGIN desktop-toggler -->
-			
-			<!-- BEGIN mobile-toggler -->
-			<div class="mobile-toggler">
-				<button type="button" class="menu-toggler" data-toggle-class="app-sidebar-mobile-toggled" data-toggle-target=".app">
-					<span class="bar"></span>
-					<span class="bar"></span>
-					<span class="bar"></span>
-				</button>
-			</div>
-			<!-- END mobile-toggler -->
+			<!-- END games-dropdown -->
 			
 			<!-- BEGIN brand -->
 			<div class="brand">
@@ -65,62 +86,6 @@
 			
 		</div>
 		<!-- END #header -->
-		
-		<!-- BEGIN #sidebar -->
-		<div id="sidebar" class="app-sidebar">
-			<!-- BEGIN scrollbar -->
-			<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
-				<!-- BEGIN menu -->
-				<div class="menu">
-					<div class="menu-header">Games</div>
-					<div class="menu-item">
-						<a href="../2048/index.html" class="menu-link">
-							<span class="menu-icon"><i class="bi bi-controller"></i></span>
-							<span class="menu-text">2048</span>
-						</a>
-					</div>
-					<div class="menu-item">
-						<a href="../asteroids/index.html" class="menu-link">
-							<span class="menu-icon"><i class="bi bi-controller"></i></span>
-							<span class="menu-text">Asteroids</span>
-						</a>
-					</div>
-					<div class="menu-item">
-						<a href="../invasion/index.html" class="menu-link">
-							<span class="menu-icon"><i class="bi bi-controller"></i></span>
-							<span class="menu-text">Invasion</span>
-						</a>
-					</div>
-					<div class="menu-item">
-						<a href="../lode-runner/index.html" class="menu-link">
-							<span class="menu-icon"><i class="bi bi-controller"></i></span>
-							<span class="menu-text">Lode Runner</span>
-						</a>
-					</div>
-					<div class="menu-item">
-						<a href="index.html" class="menu-link">
-							<span class="menu-icon"><i class="bi bi-controller"></i></span>
-							<span class="menu-text">Tetris</span>
-						</a>
-					</div>
-					<div class="menu-item">
-						<a href="../pacman/index.html" class="menu-link">
-							<span class="menu-icon"><i class="bi bi-controller"></i></span>
-							<span class="menu-text">Pac-Man</span>
-						</a>
-					</div>
-					<div class="menu-item">
-						<a href="../space-invaders/index.html" class="menu-link">
-							<span class="menu-icon"><i class="bi bi-controller"></i></span>
-							<span class="menu-text">Space Invaders</span>
-						</a>
-					</div>
-				</div>
-				<!-- END menu -->
-			</div>
-			<!-- END scrollbar -->
-		</div>
-		<!-- END #sidebar -->
 			
 		<!-- BEGIN mobile-sidebar-backdrop -->
 		<button class="app-sidebar-mobile-backdrop" data-toggle-target=".app" data-toggle-class="app-sidebar-mobile-toggled"></button>
