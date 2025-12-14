@@ -68,24 +68,37 @@ class PacMan {
   }
   
   update(maze) {
-    // Animate mouth
-    this.mouthOpen += this.mouthDirection * 0.15;
-    if (this.mouthOpen > 0.8 || this.mouthOpen < 0) {
-      this.mouthDirection *= -1;
+    // Animate mouth only when moving
+    if (this.direction.x !== 0 || this.direction.y !== 0) {
+      this.mouthOpen += this.mouthDirection * 0.15;
+      if (this.mouthOpen > 0.8 || this.mouthOpen < 0) {
+        this.mouthDirection *= -1;
+      }
+    } else {
+      // Mouth closed when stationary
+      this.mouthOpen = 0;
     }
     
     // Try to change direction
     if (this.nextDirection.x !== 0 || this.nextDirection.y !== 0) {
-      if (this.canMove(this.x + this.nextDirection.x * this.speed, this.y + this.nextDirection.y * this.speed, maze)) {
+      // Test if we can move in the requested direction
+      const testX = this.x + this.nextDirection.x * this.speed;
+      const testY = this.y + this.nextDirection.y * this.speed;
+      
+      if (this.canMove(testX, testY, maze)) {
         this.direction = { ...this.nextDirection };
       }
     }
     
     // Move in current direction
-    if (this.canMove(this.x + this.direction.x * this.speed, this.y + this.direction.y * this.speed, maze)) {
-      this.x += this.direction.x * this.speed;
-      this.y += this.direction.y * this.speed;
+    const nextX = this.x + this.direction.x * this.speed;
+    const nextY = this.y + this.direction.y * this.speed;
+    
+    if (this.canMove(nextX, nextY, maze)) {
+      this.x = nextX;
+      this.y = nextY;
     }
+    // Else: Stop at wall edge (no movement)
     
     // Wrap around tunnel (keep centered in tile)
     if (this.x < TILE_SIZE / 2) this.x = MAZE_WIDTH * TILE_SIZE - TILE_SIZE / 2;
@@ -93,29 +106,51 @@ class PacMan {
   }
   
   canMove(x, y, maze) {
-    // Simple center-point collision with Math.round
-    // Character is 8px radius, tile is 20px - fits with margin
-    // Math.round ensures symmetric detection in all directions
-    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Pac-Man radius (sprite is drawn with TILE_SIZE/2 - 2 radius)
+    const radius = TILE_SIZE / 2 - 2;
     
-    // Allow tunnel on row 14
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14;
+    // Check all four corners of Pac-Man's bounding box
+    const corners = [
+      { x: x - radius, y: y - radius }, // top-left
+      { x: x + radius, y: y - radius }, // top-right
+      { x: x - radius, y: y + radius }, // bottom-left
+      { x: x + radius, y: y + radius }  // bottom-right
+    ];
+    
+    for (const corner of corners) {
+      const gridX = Math.floor(corner.x / TILE_SIZE);
+      const gridY = Math.floor(corner.y / TILE_SIZE);
+      
+      // Allow tunnel on row 14
+      if (gridX < 0 || gridX >= MAZE_WIDTH) {
+        if (Math.floor(y / TILE_SIZE) === 14) continue;
+        return false;
+      }
+      if (gridY < 0 || gridY >= MAZE_HEIGHT) {
+        return false;
+      }
+      
+      // Check if this corner is in a wall tile
+      if (maze[gridY][gridX] === 1) {
+        return false;
+      }
     }
     
-    // Check if center is in a wall tile
-    return maze[gridY][gridX] !== 1;
+    return true;
   }
   
   getTilePos() {
-    // Characters are centered at (tile * SIZE + SIZE/2), so subtract offset first
+    // Get tile from center position
     return {
       x: Math.round((this.x - TILE_SIZE / 2) / TILE_SIZE),
       y: Math.round((this.y - TILE_SIZE / 2) / TILE_SIZE)
     };
   }
 }
+
+// Ghost house center position
+const GHOST_HOUSE_X = 14 * TILE_SIZE;
+const GHOST_HOUSE_Y = 14 * TILE_SIZE;
 
 class Ghost {
   constructor(x, y, color, name) {
@@ -127,7 +162,7 @@ class Ghost {
     this.name = name;
     this.direction = { x: 0, y: -1 };
     this.speed = 1.5;
-    this.mode = 'scatter'; // scatter, chase, frightened
+    this.mode = 'scatter'; // scatter, chase, frightened, eaten
     this.frightenedTimer = 0;
   }
   
@@ -140,13 +175,51 @@ class Ghost {
   }
   
   setFrightened() {
-    this.mode = 'frightened';
-    this.frightenedTimer = 300; // 5 seconds at 60fps
-    this.direction.x *= -1;
-    this.direction.y *= -1;
+    if (this.mode !== 'eaten') {
+      this.mode = 'frightened';
+      this.frightenedTimer = 300; // 5 seconds at 60fps
+      this.direction.x *= -1;
+      this.direction.y *= -1;
+    }
+  }
+  
+  setEaten() {
+    this.mode = 'eaten';
+    this.frightenedTimer = 0;
   }
   
   update(maze, pacman) {
+    // Handle eaten mode - eyes return to ghost house
+    if (this.mode === 'eaten') {
+      const distToHouse = Math.sqrt(
+        Math.pow(this.x - GHOST_HOUSE_X, 2) + 
+        Math.pow(this.y - GHOST_HOUSE_Y, 2)
+      );
+      
+      if (distToHouse < TILE_SIZE) {
+        // Arrived at ghost house, respawn
+        this.x = this.startX;
+        this.y = this.startY;
+        this.mode = 'scatter';
+        return;
+      }
+      
+      // Move towards ghost house (fast)
+      const dx = GHOST_HOUSE_X - this.x;
+      const dy = GHOST_HOUSE_Y - this.y;
+      const eatenSpeed = this.speed * 3;
+      
+      if (Math.abs(dx) > Math.abs(dy)) {
+        this.direction = { x: dx > 0 ? 1 : -1, y: 0 };
+      } else {
+        this.direction = { x: 0, y: dy > 0 ? 1 : -1 };
+      }
+      
+      this.x += this.direction.x * eatenSpeed;
+      this.y += this.direction.y * eatenSpeed;
+      return;
+    }
+    
     if (this.frightenedTimer > 0) {
       this.frightenedTimer--;
       if (this.frightenedTimer === 0) {
@@ -199,10 +272,11 @@ class Ghost {
       }
     }
     
-    // Move
-    if (this.canMove(this.x + this.direction.x * this.speed, this.y + this.direction.y * this.speed, maze)) {
-      this.x += this.direction.x * this.speed;
-      this.y += this.direction.y * this.speed;
+    // Move (slower when frightened)
+    const currentSpeed = this.mode === 'frightened' ? this.speed * 0.5 : this.speed;
+    if (this.canMove(this.x + this.direction.x * currentSpeed, this.y + this.direction.y * currentSpeed, maze)) {
+      this.x += this.direction.x * currentSpeed;
+      this.y += this.direction.y * currentSpeed;
     }
     
     // Wrap around tunnel (keep centered in tile)
@@ -211,21 +285,43 @@ class Ghost {
   }
   
   canMove(x, y, maze) {
-    // Simple center-point collision (same as PacMan)
-    const gridX = Math.round((x - TILE_SIZE / 2) / TILE_SIZE);
-    const gridY = Math.round((y - TILE_SIZE / 2) / TILE_SIZE);
+    // Ghost radius (similar to Pac-Man)
+    const radius = TILE_SIZE / 2 - 2;
     
-    if (gridX < 0 || gridX >= MAZE_WIDTH || gridY < 0 || gridY >= MAZE_HEIGHT) {
-      return gridY === 14;
+    // Check all four corners of ghost's bounding box
+    const corners = [
+      { x: x - radius, y: y - radius },
+      { x: x + radius, y: y - radius },
+      { x: x - radius, y: y + radius },
+      { x: x + radius, y: y + radius }
+    ];
+    
+    for (const corner of corners) {
+      const gridX = Math.floor(corner.x / TILE_SIZE);
+      const gridY = Math.floor(corner.y / TILE_SIZE);
+      
+      // Allow tunnel on row 14
+      if (gridX < 0 || gridX >= MAZE_WIDTH) {
+        if (Math.floor(y / TILE_SIZE) === 14) continue;
+        return false;
+      }
+      if (gridY < 0 || gridY >= MAZE_HEIGHT) {
+        return false;
+      }
+      
+      if (maze[gridY][gridX] === 1) {
+        return false;
+      }
     }
     
-    return maze[gridY][gridX] !== 1;
+    return true;
   }
   
   getTilePos() {
+    // Get tile from center position
     return {
-      x: Math.round((this.x - TILE_SIZE / 2) / TILE_SIZE),
-      y: Math.round((this.y - TILE_SIZE / 2) / TILE_SIZE)
+      x: Math.floor(this.x / TILE_SIZE),
+      y: Math.floor(this.y / TILE_SIZE)
     };
   }
 }
@@ -255,6 +351,23 @@ class Game {
     this.stateTimer = 0;
     this.powerPelletActive = false;
     this.powerPelletTimer = 0;
+    this.frameCount = 0; // For animations like power pellet blinking
+    this.pauseFrames = 0; // Pause when eating dots
+    
+    // Fruit system
+    this.fruit = null;
+    this.fruitTimer = 0;
+    this.dotsEaten = 0;
+    this.fruitTypes = [
+      { name: 'cherry', color: '#FF0000', points: 100 },
+      { name: 'strawberry', color: '#FF6B6B', points: 300 },
+      { name: 'orange', color: '#FFA500', points: 500 },
+      { name: 'apple', color: '#00FF00', points: 700 },
+      { name: 'melon', color: '#90EE90', points: 1000 },
+      { name: 'galaxian', color: '#00BFFF', points: 2000 },
+      { name: 'bell', color: '#FFD700', points: 3000 },
+      { name: 'key', color: '#C0C0C0', points: 5000 }
+    ];
     
     this.setupControls();
   }
@@ -335,6 +448,15 @@ class Game {
     
     if (this.state !== STATE_PLAYING) return;
     
+    // Increment frame counter for animations
+    this.frameCount++;
+    
+    // Handle pause frames (1-frame pause when eating dots)
+    if (this.pauseFrames > 0) {
+      this.pauseFrames--;
+      return;
+    }
+    
     // Update power pellet timer
     if (this.powerPelletTimer > 0) {
       this.powerPelletTimer--;
@@ -352,15 +474,41 @@ class Game {
       this.maze[pacTile.y][pacTile.x] = 0;
       this.score += 10;
       this.pelletsRemaining--;
+      this.dotsEaten++;
+      this.pauseFrames = 1; // 1-frame pause when eating dot
       this.updateStats();
+      
+      // Spawn fruit at 70 and 170 dots eaten
+      if ((this.dotsEaten === 70 || this.dotsEaten === 170) && !this.fruit) {
+        this.spawnFruit();
+      }
     } else if (this.maze[pacTile.y] && this.maze[pacTile.y][pacTile.x] === 3) {
       this.maze[pacTile.y][pacTile.x] = 0;
       this.score += 50;
       this.pelletsRemaining--;
+      this.dotsEaten++;
+      this.pauseFrames = 3; // Slightly longer pause for power pellet
       this.powerPelletActive = true;
       this.powerPelletTimer = 300;
       this.ghosts.forEach(ghost => ghost.setFrightened());
       this.updateStats();
+    }
+    
+    // Update fruit timer
+    if (this.fruit) {
+      this.fruitTimer--;
+      if (this.fruitTimer <= 0) {
+        this.fruit = null;
+      }
+      
+      // Check fruit collection
+      const fruitTileX = 14;
+      const fruitTileY = 17;
+      if (pacTile.x === fruitTileX && pacTile.y === fruitTileY) {
+        this.score += this.fruit.points;
+        this.fruit = null;
+        this.updateStats();
+      }
     }
     
     // Check level complete
@@ -382,14 +530,12 @@ class Game {
       
       if (dist < TILE_SIZE) {
         if (ghost.mode === 'frightened') {
-          // Eat ghost
+          // Eat ghost - eyes float back to house
           this.score += 200;
-          ghost.x = ghost.startX;
-          ghost.y = ghost.startY;
-          ghost.mode = 'scatter';
+          ghost.setEaten();
           this.updateStats();
-        } else {
-          // Pac-Man dies
+        } else if (ghost.mode !== 'eaten') {
+          // Pac-Man dies (but not if ghost is just eyes)
           this.state = STATE_DYING;
           this.stateTimer = 0;
         }
@@ -407,6 +553,9 @@ class Game {
     
     // Draw pellets
     this.drawPellets();
+    
+    // Draw fruit
+    this.drawFruit();
     
     // Draw ghosts
     if (this.state !== STATE_DYING) {
@@ -451,7 +600,9 @@ class Game {
           this.ctx.arc(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 2, 0, Math.PI * 2);
           this.ctx.fill();
         } else if (this.maze[y][x] === 3) {
-          this.ctx.fillStyle = '#3cd2a5';
+          // Power pellets blink (alternate every 10 frames)
+          const blinkOn = Math.floor(this.frameCount / 10) % 2 === 0;
+          this.ctx.fillStyle = blinkOn ? '#3cd2a5' : '#1a5c4a';
           this.ctx.beginPath();
           this.ctx.arc(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 5, 0, Math.PI * 2);
           this.ctx.fill();
@@ -472,6 +623,22 @@ class Game {
   }
   
   drawGhost(ghost) {
+    // Eaten mode - only draw eyes floating back to house
+    if (ghost.mode === 'eaten') {
+      // Eye whites
+      this.ctx.fillStyle = '#FFFFFF';
+      this.ctx.fillRect(ghost.x - 6, ghost.y - 4, 5, 7);
+      this.ctx.fillRect(ghost.x + 1, ghost.y - 4, 5, 7);
+      
+      // Pupils - offset based on travel direction
+      const pupilOffsetX = ghost.direction.x * 2;
+      const pupilOffsetY = ghost.direction.y * 2;
+      this.ctx.fillStyle = '#0000FF';
+      this.ctx.fillRect(ghost.x - 5 + pupilOffsetX, ghost.y - 1 + pupilOffsetY, 2, 3);
+      this.ctx.fillRect(ghost.x + 3 + pupilOffsetX, ghost.y - 1 + pupilOffsetY, 2, 3);
+      return;
+    }
+    
     const color = ghost.mode === 'frightened' ? '#5ddbb5' : ghost.color;
     this.ctx.fillStyle = color;
     
@@ -490,12 +657,78 @@ class Game {
     
     // Eyes
     if (ghost.mode !== 'frightened') {
+      // Eye whites
       this.ctx.fillStyle = '#FFFFFF';
-      this.ctx.fillRect(ghost.x - 6, ghost.y - 8, 4, 6);
-      this.ctx.fillRect(ghost.x + 2, ghost.y - 8, 4, 6);
-      this.ctx.fillStyle = '#000000';
-      this.ctx.fillRect(ghost.x - 5, ghost.y - 6, 2, 3);
-      this.ctx.fillRect(ghost.x + 3, ghost.y - 6, 2, 3);
+      this.ctx.fillRect(ghost.x - 6, ghost.y - 8, 5, 7);
+      this.ctx.fillRect(ghost.x + 1, ghost.y - 8, 5, 7);
+      
+      // Pupils - offset based on travel direction
+      const pupilOffsetX = ghost.direction.x * 2;
+      const pupilOffsetY = ghost.direction.y * 2;
+      this.ctx.fillStyle = '#0000FF';
+      this.ctx.fillRect(ghost.x - 5 + pupilOffsetX, ghost.y - 5 + pupilOffsetY, 2, 3);
+      this.ctx.fillRect(ghost.x + 3 + pupilOffsetX, ghost.y - 5 + pupilOffsetY, 2, 3);
+    } else {
+      // Frightened mode - bulging worried eyes
+      this.ctx.fillStyle = '#FFFFFF';
+      this.ctx.beginPath();
+      this.ctx.arc(ghost.x - 4, ghost.y - 4, 3, 0, Math.PI * 2);
+      this.ctx.arc(ghost.x + 4, ghost.y - 4, 3, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.fillStyle = '#FF0000';
+      this.ctx.beginPath();
+      this.ctx.arc(ghost.x - 4, ghost.y - 4, 1.5, 0, Math.PI * 2);
+      this.ctx.arc(ghost.x + 4, ghost.y - 4, 1.5, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+  }
+  
+  spawnFruit() {
+    // Get fruit type based on level (capped at 8 types)
+    const fruitIndex = Math.min(this.level - 1, this.fruitTypes.length - 1);
+    this.fruit = this.fruitTypes[fruitIndex];
+    this.fruitTimer = 600; // 10 seconds at 60fps
+  }
+  
+  drawFruit() {
+    if (!this.fruit) return;
+    
+    const fruitX = 14 * TILE_SIZE + TILE_SIZE / 2;
+    const fruitY = 17 * TILE_SIZE + TILE_SIZE / 2;
+    
+    this.ctx.fillStyle = this.fruit.color;
+    
+    // Draw different fruit shapes based on type
+    switch (this.fruit.name) {
+      case 'cherry':
+        // Two circles with stem
+        this.ctx.beginPath();
+        this.ctx.arc(fruitX - 3, fruitY + 2, 4, 0, Math.PI * 2);
+        this.ctx.arc(fruitX + 3, fruitY + 2, 4, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#00AA00';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(fruitX - 3, fruitY - 2);
+        this.ctx.lineTo(fruitX, fruitY - 6);
+        this.ctx.lineTo(fruitX + 3, fruitY - 2);
+        this.ctx.stroke();
+        break;
+      case 'strawberry':
+        // Triangle-ish shape
+        this.ctx.beginPath();
+        this.ctx.moveTo(fruitX, fruitY - 5);
+        this.ctx.lineTo(fruitX + 5, fruitY + 5);
+        this.ctx.lineTo(fruitX - 5, fruitY + 5);
+        this.ctx.closePath();
+        this.ctx.fill();
+        break;
+      default:
+        // Generic circle for other fruits
+        this.ctx.beginPath();
+        this.ctx.arc(fruitX, fruitY, 6, 0, Math.PI * 2);
+        this.ctx.fill();
+        break;
     }
   }
   
@@ -508,8 +741,17 @@ class Game {
   
   updateStats() {
     document.getElementById('score').textContent = this.score;
-    document.getElementById('lives').textContent = this.lives;
     document.getElementById('level').textContent = this.level;
+    
+    // Display lives as Pac-Man icons
+    const livesContainer = document.getElementById('lives-container');
+    livesContainer.innerHTML = '';
+    for (let i = 0; i < this.lives; i++) {
+      const pacIcon = document.createElement('span');
+      pacIcon.className = 'pac-life-icon';
+      pacIcon.innerHTML = '&#9679;'; // Circle that we'll style as Pac-Man
+      livesContainer.appendChild(pacIcon);
+    }
   }
   
   resetPositions() {
@@ -523,6 +765,8 @@ class Game {
     this.level++;
     this.maze = JSON.parse(JSON.stringify(MAZE_LAYOUT));
     this.pelletsRemaining = this.countPellets();
+    this.dotsEaten = 0;
+    this.fruit = null;
     this.resetPositions();
     this.ghosts.forEach(ghost => ghost.speed += 0.2);
     this.state = STATE_READY;
@@ -536,6 +780,8 @@ class Game {
     this.level = 1;
     this.maze = JSON.parse(JSON.stringify(MAZE_LAYOUT));
     this.pelletsRemaining = this.countPellets();
+    this.dotsEaten = 0;
+    this.fruit = null;
     this.resetPositions();
     this.ghosts.forEach(ghost => ghost.speed = 1.5);
     this.state = STATE_READY;
