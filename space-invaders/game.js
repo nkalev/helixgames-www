@@ -135,11 +135,22 @@ class Game {
       y: y,
       width: 44,
       height: 32,
-      damage: [] // Array of damage pixels
+      pixels: [] // 2D array of pixels (true = intact, false = destroyed)
     };
     
-    // Initialize damage grid (0 = intact, 1 = destroyed)
-    // Using simplified damage model for performance
+    // Initialize pixel grid - all pixels start intact
+    for (let py = 0; py < bunker.height; py++) {
+      bunker.pixels[py] = [];
+      for (let px = 0; px < bunker.width; px++) {
+        // Create bunker shape with arch at bottom
+        const centerX = bunker.width / 2;
+        const archRadius = 10;
+        const inArch = py > bunker.height - 12 && 
+                       Math.sqrt(Math.pow(px - centerX, 2) + Math.pow(py - (bunker.height), 2)) < archRadius;
+        bunker.pixels[py][px] = !inArch; // true = solid, false = empty
+      }
+    }
+    
     this.bunkers.push(bunker);
   }
   
@@ -231,7 +242,7 @@ class Game {
       
       // Check bunker collision (player bullets damage bunkers too!)
       this.bunkers.forEach(bunker => {
-        if (b.active && this.checkCollision(b, bunker)) {
+        if (b.active && this.checkBunkerCollision(b, bunker)) {
           b.active = false;
           this.damageBunker(bunker, b.x, b.y);
         }
@@ -251,7 +262,7 @@ class Game {
       
       // Check bunker collision
       this.bunkers.forEach(bunker => {
-        if (b.active && this.checkCollision(b, bunker)) {
+        if (b.active && this.checkBunkerCollision(b, bunker)) {
           b.active = false;
           this.damageBunker(bunker, b.x, b.y);
         }
@@ -389,10 +400,28 @@ class Game {
   }
   
   damageBunker(bunker, hitX, hitY) {
-    // Simple distance-based damage
-    // In a full implementation, this would erode pixels
-    // Here we just track hit count or remove logic if simplified
-    // For now, let's just make visual damage holes
+    // Convert hit position to local bunker coordinates
+    const localX = Math.floor(hitX - bunker.x);
+    const localY = Math.floor(hitY - bunker.y);
+    
+    // Damage radius - destroys pixels in a circular area
+    const damageRadius = 4;
+    
+    for (let dy = -damageRadius; dy <= damageRadius; dy++) {
+      for (let dx = -damageRadius; dx <= damageRadius; dx++) {
+        const px = localX + dx;
+        const py = localY + dy;
+        
+        // Check if within bunker bounds
+        if (px >= 0 && px < bunker.width && py >= 0 && py < bunker.height) {
+          // Check if within damage circle
+          if (dx * dx + dy * dy <= damageRadius * damageRadius) {
+            bunker.pixels[py][px] = false; // Destroy pixel
+          }
+        }
+      }
+    }
+    
     this.createExplosion(hitX, hitY, '#3cd2a5', 5);
   }
   
@@ -416,6 +445,31 @@ class Game {
             rect1.y + rect1.height > rect2.y);
   }
   
+  checkBunkerCollision(bullet, bunker) {
+    // First check bounding box
+    if (!(bullet.x < bunker.x + bunker.width &&
+          bullet.x + bullet.width > bunker.x &&
+          bullet.y < bunker.y + bunker.height &&
+          bullet.y + bullet.height > bunker.y)) {
+      return false;
+    }
+    
+    // Then check if any solid pixels are hit
+    const startX = Math.max(0, Math.floor(bullet.x - bunker.x));
+    const endX = Math.min(bunker.width, Math.ceil(bullet.x + bullet.width - bunker.x));
+    const startY = Math.max(0, Math.floor(bullet.y - bunker.y));
+    const endY = Math.min(bunker.height, Math.ceil(bullet.y + bullet.height - bunker.y));
+    
+    for (let py = startY; py < endY; py++) {
+      for (let px = startX; px < endX; px++) {
+        if (bunker.pixels[py] && bunker.pixels[py][px]) {
+          return true; // Hit a solid pixel
+        }
+      }
+    }
+    return false;
+  }
+  
   draw() {
     // Clear
     this.ctx.fillStyle = '#0a0e10';
@@ -426,13 +480,32 @@ class Game {
     
     // Draw Player
     if (!this.player.isDead) {
+      const px = this.player.x;
+      const py = this.player.y;
+      
+      // Main hull (classic cannon shape)
       this.ctx.fillStyle = '#00ff00';
-      // Simple ship shape
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.player.x, this.player.y - 12);
-      this.ctx.lineTo(this.player.x + 20, this.player.y + 12);
-      this.ctx.lineTo(this.player.x - 20, this.player.y + 12);
-      this.ctx.fill();
+      
+      // Base platform
+      this.ctx.fillRect(px - 18, py + 6, 36, 6);
+      
+      // Middle section
+      this.ctx.fillRect(px - 12, py, 24, 8);
+      
+      // Upper turret
+      this.ctx.fillRect(px - 6, py - 6, 12, 8);
+      
+      // Cannon barrel
+      this.ctx.fillRect(px - 2, py - 14, 4, 10);
+      
+      // Accent details
+      this.ctx.fillStyle = '#00cc00';
+      this.ctx.fillRect(px - 14, py + 2, 4, 4);
+      this.ctx.fillRect(px + 10, py + 2, 4, 4);
+      
+      // Cockpit window
+      this.ctx.fillStyle = '#80ffaa';
+      this.ctx.fillRect(px - 3, py - 4, 6, 4);
     }
     
     // Draw Aliens
@@ -463,16 +536,16 @@ class Game {
       this.ctx.fill();
     }
     
-    // Draw Bunkers
+    // Draw Bunkers (pixel by pixel for damage effect)
     this.ctx.fillStyle = '#3cd2a5';
     this.bunkers.forEach(b => {
-      this.ctx.fillRect(b.x, b.y, b.width, b.height);
-      // Arch
-      this.ctx.fillStyle = '#0a0e10';
-      this.ctx.beginPath();
-      this.ctx.arc(b.x + b.width/2, b.y + b.height, 10, Math.PI, 0);
-      this.ctx.fill();
-      this.ctx.fillStyle = '#3cd2a5'; // Reset
+      for (let py = 0; py < b.height; py++) {
+        for (let px = 0; px < b.width; px++) {
+          if (b.pixels[py] && b.pixels[py][px]) {
+            this.ctx.fillRect(b.x + px, b.y + py, 1, 1);
+          }
+        }
+      }
     });
     
     // Draw Bullets
