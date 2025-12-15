@@ -1,1275 +1,495 @@
-// Canvas Asteroids
+(() => {
+  'use strict';
 
-KEY_CODES = {
-  32: 'space',
-  37: 'left',
-  38: 'up',
-  39: 'right',
-  40: 'down',
-  70: 'f',
-  71: 'g',
-  72: 'h',
-  77: 'm',
-  80: 'p'
-}
+  const canvas = document.getElementById('canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-KEY_STATUS = { keyDown:false };
-for (code in KEY_CODES) {
-  KEY_STATUS[KEY_CODES[code]] = false;
-}
+  const scoreEl = document.getElementById('score');
+  const livesEl = document.getElementById('lives');
 
-$(window).keydown(function (e) {
-  KEY_STATUS.keyDown = true;
-  if (KEY_CODES[e.keyCode]) {
-    e.preventDefault();
-    KEY_STATUS[KEY_CODES[e.keyCode]] = true;
-  }
-}).keyup(function (e) {
-  KEY_STATUS.keyDown = false;
-  if (KEY_CODES[e.keyCode]) {
-    e.preventDefault();
-    KEY_STATUS[KEY_CODES[e.keyCode]] = false;
-  }
-});
+  const W = canvas.width;
+  const H = canvas.height;
 
-GRID_SIZE = 60;
+  const TAU = Math.PI * 2;
 
-Matrix = function (rows, columns) {
-  var i, j;
-  this.data = new Array(rows);
-  for (i = 0; i < rows; i++) {
-    this.data[i] = new Array(columns);
-  }
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const wrap = (p, max) => (p < 0 ? p + max : (p >= max ? p - max : p));
 
-  this.configure = function (rot, scale, transx, transy) {
-    var rad = (rot * Math.PI)/180;
-    var sin = Math.sin(rad) * scale;
-    var cos = Math.cos(rad) * scale;
-    this.set(cos, -sin, transx,
-             sin,  cos, transy);
-  };
+  const keys = new Map();
+  const keyDown = (code) => keys.get(code) === true;
 
-  this.set = function () {
-    var k = 0;
-    for (i = 0; i < rows; i++) {
-      for (j = 0; j < columns; j++) {
-        this.data[i][j] = arguments[k];
-        k++;
-      }
+  let paused = false;
+
+  window.addEventListener('keydown', (e) => {
+    // Prevent page scroll
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault();
+
+    if (e.code === 'KeyP' && !e.repeat) {
+      paused = !paused;
+      return;
     }
+
+    keys.set(e.code, true);
+  }, { passive: false });
+
+  window.addEventListener('keyup', (e) => {
+    keys.set(e.code, false);
+  });
+
+  function vecLen(x, y) {
+    return Math.sqrt(x * x + y * y);
   }
 
-  this.multiply = function () {
-    var vector = new Array(rows);
-    for (i = 0; i < rows; i++) {
-      vector[i] = 0;
-      for (j = 0; j < columns; j++) {
-        vector[i] += this.data[i][j] * arguments[j];
-      }
+  function dist2(ax, ay, bx, by) {
+    const dx = ax - bx;
+    const dy = ay - by;
+    return dx * dx + dy * dy;
+  }
+
+  function angleToVec(a) {
+    return { x: Math.cos(a), y: Math.sin(a) };
+  }
+
+  function shipForwardVec(rot) {
+    // Ship nose is SHIP_SHAPE[0] = {x:0,y:-12} in local space.
+    // Rotating (0,-1) by rot yields (sin(rot), -cos(rot)).
+    return { x: Math.sin(rot), y: -Math.cos(rot) };
+  }
+
+  function drawText(text, x, y, size = 22, align = 'center') {
+    ctx.save();
+    ctx.fillStyle = '#eafff8';
+    ctx.font = `600 ${size}px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial`;
+    ctx.textAlign = align;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  function strokePolygon(points, x, y, rot, scale, color = '#3cd2a5', lineWidth = 2) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.scale(scale, scale);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth / scale;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function makeAsteroidShape(seedPoints = 10) {
+    const pts = [];
+    for (let i = 0; i < seedPoints; i++) {
+      const a = (i / seedPoints) * TAU;
+      const r = rand(0.75, 1.25);
+      pts.push({ x: Math.cos(a) * r, y: Math.sin(a) * r });
     }
-    return vector;
-  };
-};
+    return pts;
+  }
 
-Sprite = function () {
-  this.init = function (name, points) {
-    this.name     = name;
-    this.points   = points;
+  const SHIP_SHAPE = [
+    { x: 0, y: -12 },
+    { x: 9, y: 10 },
+    { x: 0, y: 6 },
+    { x: -9, y: 10 },
+  ];
 
-    this.vel = {
-      x:   0,
-      y:   0,
-      rot: 0
-    };
-
-    this.acc = {
-      x:   0,
-      y:   0,
-      rot: 0
-    };
-  };
-
-  this.children = {};
-
-  this.visible  = false;
-  this.reap     = false;
-  this.bridgesH = true;
-  this.bridgesV = true;
-
-  this.collidesWith = [];
-
-  this.x     = 0;
-  this.y     = 0;
-  this.rot   = 0;
-  this.scale = 1;
-
-  this.currentNode = null;
-  this.nextSprite  = null;
-
-  this.preMove  = null;
-  this.postMove = null;
-
-  this.color = 'black';
-
-  this.run = function(delta) {
-
-    this.move(delta);
-    this.updateGrid();
-
-    this.context.save();
-    this.configureTransform();
-    this.draw();
-
-    var canidates = this.findCollisionCanidates();
-
-    this.matrix.configure(this.rot, this.scale, this.x, this.y);
-    this.checkCollisionsAgainst(canidates);
-
-    this.context.restore();
-
-    if (this.bridgesH && this.currentNode && this.currentNode.dupe.horizontal) {
-      this.x += this.currentNode.dupe.horizontal;
-      this.context.save();
-      this.configureTransform();
-      this.draw();
-      this.checkCollisionsAgainst(canidates);
-      this.context.restore();
-      if (this.currentNode) {
-        this.x -= this.currentNode.dupe.horizontal;
-      }
-    }
-    if (this.bridgesV && this.currentNode && this.currentNode.dupe.vertical) {
-      this.y += this.currentNode.dupe.vertical;
-      this.context.save();
-      this.configureTransform();
-      this.draw();
-      this.checkCollisionsAgainst(canidates);
-      this.context.restore();
-      if (this.currentNode) {
-        this.y -= this.currentNode.dupe.vertical;
-      }
-    }
-    if (this.bridgesH && this.bridgesV &&
-        this.currentNode &&
-        this.currentNode.dupe.vertical &&
-        this.currentNode.dupe.horizontal) {
-      this.x += this.currentNode.dupe.horizontal;
-      this.y += this.currentNode.dupe.vertical;
-      this.context.save();
-      this.configureTransform();
-      this.draw();
-      this.checkCollisionsAgainst(canidates);
-      this.context.restore();
-      if (this.currentNode) {
-        this.x -= this.currentNode.dupe.horizontal;
-        this.y -= this.currentNode.dupe.vertical;
-      }
-    }
-  };
-  this.move = function (delta) {
-    if (!this.visible) return;
-    this.transPoints = null; // clear cached points
-
-    if ($.isFunction(this.preMove)) {
-      this.preMove(delta);
+  class Bullet {
+    constructor(x, y, vx, vy) {
+      this.x = x;
+      this.y = y;
+      this.vx = vx;
+      this.vy = vy;
+      this.life = 0;
+      this.maxLife = 1.1;
+      this.r = 2;
+      this.dead = false;
     }
 
-    this.vel.x += this.acc.x * delta;
-    this.vel.y += this.acc.y * delta;
-    this.x += this.vel.x * delta;
-    this.y += this.vel.y * delta;
-    this.rot += this.vel.rot * delta;
-    if (this.rot > 360) {
-      this.rot -= 360;
-    } else if (this.rot < 0) {
-      this.rot += 360;
-    }
-
-    if ($.isFunction(this.postMove)) {
-      this.postMove(delta);
-    }
-  };
-  this.updateGrid = function () {
-    if (!this.visible) return;
-    var gridx = Math.floor(this.x / GRID_SIZE);
-    var gridy = Math.floor(this.y / GRID_SIZE);
-    gridx = (gridx >= this.grid.length) ? 0 : gridx;
-    gridy = (gridy >= this.grid[0].length) ? 0 : gridy;
-    gridx = (gridx < 0) ? this.grid.length-1 : gridx;
-    gridy = (gridy < 0) ? this.grid[0].length-1 : gridy;
-    var newNode = this.grid[gridx][gridy];
-    if (newNode != this.currentNode) {
-      if (this.currentNode) {
-        this.currentNode.leave(this);
-      }
-      newNode.enter(this);
-      this.currentNode = newNode;
-    }
-
-    if (KEY_STATUS.g && this.currentNode) {
-      this.context.lineWidth = 3.0;
-      this.context.strokeStyle = 'green';
-      this.context.strokeRect(gridx*GRID_SIZE+2, gridy*GRID_SIZE+2, GRID_SIZE-4, GRID_SIZE-4);
-      this.context.strokeStyle = 'black';
-      this.context.lineWidth = 1.0;
-    }
-  };
-  this.configureTransform = function () {
-    if (!this.visible) return;
-
-    var rad = (this.rot * Math.PI)/180;
-
-    this.context.translate(this.x, this.y);
-    this.context.rotate(rad);
-    this.context.scale(this.scale, this.scale);
-  };
-  this.draw = function () {
-    if (!this.visible) return;
-
-    this.context.lineWidth = 1.0 / this.scale;
-
-    for (child in this.children) {
-      this.children[child].draw();
-    }
-
-    this.context.beginPath();
-
-    this.context.moveTo(this.points[0], this.points[1]);
-    for (var i = 1; i < this.points.length/2; i++) {
-      var xi = i*2;
-      var yi = xi + 1;
-      this.context.lineTo(this.points[xi], this.points[yi]);
-    }
-
-    this.context.closePath();
-    this.context.stroke();
-  };
-  this.findCollisionCanidates = function () {
-    if (!this.visible || !this.currentNode) return [];
-    var cn = this.currentNode;
-    var canidates = [];
-    if (cn.nextSprite) canidates.push(cn.nextSprite);
-    if (cn.north.nextSprite) canidates.push(cn.north.nextSprite);
-    if (cn.south.nextSprite) canidates.push(cn.south.nextSprite);
-    if (cn.east.nextSprite) canidates.push(cn.east.nextSprite);
-    if (cn.west.nextSprite) canidates.push(cn.west.nextSprite);
-    if (cn.north.east.nextSprite) canidates.push(cn.north.east.nextSprite);
-    if (cn.north.west.nextSprite) canidates.push(cn.north.west.nextSprite);
-    if (cn.south.east.nextSprite) canidates.push(cn.south.east.nextSprite);
-    if (cn.south.west.nextSprite) canidates.push(cn.south.west.nextSprite);
-    return canidates
-  };
-  this.checkCollisionsAgainst = function (canidates) {
-    for (var i = 0; i < canidates.length; i++) {
-      var ref = canidates[i];
-      do {
-        this.checkCollision(ref);
-        ref = ref.nextSprite;
-      } while (ref)
-    }
-  };
-  this.checkCollision = function (other) {
-    if (!other.visible ||
-         this == other ||
-         this.collidesWith.indexOf(other.name) == -1) return;
-    var trans = other.transformedPoints();
-    var px, py;
-    var count = trans.length/2;
-    for (var i = 0; i < count; i++) {
-      px = trans[i*2];
-      py = trans[i*2 + 1];
-      // mozilla doesn't take into account transforms with isPointInPath >:-P
-      if (($.browser.mozilla) ? this.pointInPolygon(px, py) : this.context.isPointInPath(px, py)) {
-        other.collision(this);
-        this.collision(other);
+    update(dt) {
+      this.life += dt;
+      if (this.life >= this.maxLife) {
+        this.dead = true;
         return;
       }
-    }
-  };
-  this.pointInPolygon = function (x, y) {
-    var points = this.transformedPoints();
-    var j = 2;
-    var y0, y1;
-    var oddNodes = false;
-    for (var i = 0; i < points.length; i += 2) {
-      y0 = points[i + 1];
-      y1 = points[j + 1];
-      if ((y0 < y && y1 >= y) ||
-          (y1 < y && y0 >= y)) {
-        if (points[i]+(y-y0)/(y1-y0)*(points[j]-points[i]) < x) {
-          oddNodes = !oddNodes;
-        }
-      }
-      j += 2
-      if (j == points.length) j = 0;
-    }
-    return oddNodes;
-  };
-  this.collision = function () {
-  };
-  this.die = function () {
-    this.visible = false;
-    this.reap = true;
-    if (this.currentNode) {
-      this.currentNode.leave(this);
-      this.currentNode = null;
-    }
-  };
-  this.transformedPoints = function () {
-    if (this.transPoints) return this.transPoints;
-    var trans = new Array(this.points.length);
-    this.matrix.configure(this.rot, this.scale, this.x, this.y);
-    for (var i = 0; i < this.points.length/2; i++) {
-      var xi = i*2;
-      var yi = xi + 1;
-      var pts = this.matrix.multiply(this.points[xi], this.points[yi], 1);
-      trans[xi] = pts[0];
-      trans[yi] = pts[1];
-    }
-    this.transPoints = trans; // cache translated points
-    return trans;
-  };
-  this.isClear = function () {
-    if (this.collidesWith.length == 0) return true;
-    var cn = this.currentNode;
-    if (cn == null) {
-      var gridx = Math.floor(this.x / GRID_SIZE);
-      var gridy = Math.floor(this.y / GRID_SIZE);
-      gridx = (gridx >= this.grid.length) ? 0 : gridx;
-      gridy = (gridy >= this.grid[0].length) ? 0 : gridy;
-      cn = this.grid[gridx][gridy];
-    }
-    return (cn.isEmpty(this.collidesWith) &&
-            cn.north.isEmpty(this.collidesWith) &&
-            cn.south.isEmpty(this.collidesWith) &&
-            cn.east.isEmpty(this.collidesWith) &&
-            cn.west.isEmpty(this.collidesWith) &&
-            cn.north.east.isEmpty(this.collidesWith) &&
-            cn.north.west.isEmpty(this.collidesWith) &&
-            cn.south.east.isEmpty(this.collidesWith) &&
-            cn.south.west.isEmpty(this.collidesWith));
-  };
-  this.wrapPostMove = function () {
-    if (this.x > Game.canvasWidth) {
-      this.x = 0;
-    } else if (this.x < 0) {
-      this.x = Game.canvasWidth;
-    }
-    if (this.y > Game.canvasHeight) {
-      this.y = 0;
-    } else if (this.y < 0) {
-      this.y = Game.canvasHeight;
-    }
-  };
-  this.draw = function () {
-    if (!this.visible) return;
-
-    this.context.lineWidth = 1.0 / this.scale;
-
-    for (child in this.children) {
-      this.children[child].draw();
+      this.x = wrap(this.x + this.vx * dt, W);
+      this.y = wrap(this.y + this.vy * dt, H);
     }
 
-    this.context.beginPath();
-
-    this.context.moveTo(this.points[0], this.points[1]);
-    for (var i = 1; i < this.points.length/2; i++) {
-      var xi = i*2;
-      var yi = xi + 1;
-      this.context.lineTo(this.points[xi], this.points[yi]);
-    }
-
-    this.context.closePath();
-    this.context.strokeStyle = this.color;
-    this.context.stroke();
-  };
-
-};
-
-Ship = function () {
-  this.init("ship",
-            [-5,   4,
-              0, -12,
-              5,   4]);
-
-  this.children.exhaust = new Sprite();
-  this.children.exhaust.init("exhaust",
-                             [-3,  6,
-                               0, 11,
-                               3,  6]);
-
-  this.bulletCounter = 0;
-
-  this.postMove = this.wrapPostMove;
-
-  this.collidesWith = ["asteroid", "bigalien", "alienbullet"];
-
-  this.preMove = function (delta) {
-    if (KEY_STATUS.left) {
-      this.vel.rot = -6;
-    } else if (KEY_STATUS.right) {
-      this.vel.rot = 6;
-    } else {
-      this.vel.rot = 0;
-    }
-
-    if (KEY_STATUS.up) {
-      var rad = ((this.rot-90) * Math.PI)/180;
-      this.acc.x = 0.5 * Math.cos(rad);
-      this.acc.y = 0.5 * Math.sin(rad);
-      this.children.exhaust.visible = Math.random() > 0.1;
-    } else {
-      this.acc.x = 0;
-      this.acc.y = 0;
-      this.children.exhaust.visible = false;
-    }
-
-    if (this.bulletCounter > 0) {
-      this.bulletCounter -= delta;
-    }
-    if (KEY_STATUS.space) {
-      if (this.bulletCounter <= 0) {
-        this.bulletCounter = 10;
-        for (var i = 0; i < this.bullets.length; i++) {
-          if (!this.bullets[i].visible) {
-            SFX.laser();
-            var bullet = this.bullets[i];
-            var rad = ((this.rot-90) * Math.PI)/180;
-            var vectorx = Math.cos(rad);
-            var vectory = Math.sin(rad);
-            // move to the nose of the ship
-            bullet.x = this.x + vectorx * 4;
-            bullet.y = this.y + vectory * 4;
-            bullet.vel.x = 6 * vectorx + this.vel.x;
-            bullet.vel.y = 6 * vectory + this.vel.y;
-            bullet.visible = true;
-            break;
-          }
-        }
-      }
-    }
-
-    // limit the ship's speed
-    if (Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y) > 8) {
-      this.vel.x *= 0.95;
-      this.vel.y *= 0.95;
-    }
-  };
-
-  this.collision = function (other) {
-    SFX.explosion();
-    Game.explosionAt(other.x, other.y);
-    Game.FSM.state = 'player_died';
-    this.visible = false;
-    this.currentNode.leave(this);
-    this.currentNode = null;
-    Game.lives--;
-  };
-
-};
-Ship.prototype = new Sprite();
-Ship.prototype.color = 'white';
-
-BigAlien = function () {
-  this.init("bigalien",
-            [-20,   0,
-             -12,  -4,
-              12,  -4,
-              20,   0,
-              12,   4,
-             -12,   4,
-             -20,   0,
-              20,   0]);
-
-  this.children.top = new Sprite();
-  this.children.top.init("bigalien_top",
-                         [-8, -4,
-                          -6, -6,
-                           6, -6,
-                           8, -4]);
-  this.children.top.visible = true;
-
-  this.children.bottom = new Sprite();
-  this.children.bottom.init("bigalien_top",
-                            [ 8, 4,
-                              6, 6,
-                             -6, 6,
-                             -8, 4]);
-  this.children.bottom.visible = true;
-
-  this.collidesWith = ["asteroid", "ship", "bullet"];
-
-  this.bridgesH = false;
-
-  this.bullets = [];
-  this.bulletCounter = 0;
-
-  this.newPosition = function () {
-    if (Math.random() < 0.5) {
-      this.x = -20;
-      this.vel.x = 1.5;
-    } else {
-      this.x = Game.canvasWidth + 20;
-      this.vel.x = -1.5;
-    }
-    this.y = Math.random() * Game.canvasHeight;
-  };
-
-  this.setup = function () {
-    this.newPosition();
-
-    for (var i = 0; i < 3; i++) {
-      var bull = new AlienBullet();
-      this.bullets.push(bull);
-      Game.sprites.push(bull);
-    }
-  };
-
-  this.preMove = function (delta) {
-    var cn = this.currentNode;
-    if (cn == null) return;
-
-    var topCount = 0;
-    if (cn.north.nextSprite) topCount++;
-    if (cn.north.east.nextSprite) topCount++;
-    if (cn.north.west.nextSprite) topCount++;
-
-    var bottomCount = 0;
-    if (cn.south.nextSprite) bottomCount++;
-    if (cn.south.east.nextSprite) bottomCount++;
-    if (cn.south.west.nextSprite) bottomCount++;
-
-    if (topCount > bottomCount) {
-      this.vel.y = 1;
-    } else if (topCount < bottomCount) {
-      this.vel.y = -1;
-    } else if (Math.random() < 0.01) {
-      this.vel.y = -this.vel.y;
-    }
-
-    this.bulletCounter -= delta;
-    if (this.bulletCounter <= 0) {
-      this.bulletCounter = 22;
-      for (var i = 0; i < this.bullets.length; i++) {
-        if (!this.bullets[i].visible) {
-          bullet = this.bullets[i];
-          var rad = 2 * Math.PI * Math.random();
-          var vectorx = Math.cos(rad);
-          var vectory = Math.sin(rad);
-          bullet.x = this.x;
-          bullet.y = this.y;
-          bullet.vel.x = 6 * vectorx;
-          bullet.vel.y = 6 * vectory;
-          bullet.visible = true;
-          SFX.laser();
-          break;
-        }
-      }
-    }
-
-  };
-
-  BigAlien.prototype.collision = function (other) {
-    if (other.name == "bullet") Game.score += 200;
-    SFX.explosion();
-    Game.explosionAt(other.x, other.y);
-    this.visible = false;
-    this.newPosition();
-  };
-
-  this.postMove = function () {
-    if (this.y > Game.canvasHeight) {
-      this.y = 0;
-    } else if (this.y < 0) {
-      this.y = Game.canvasHeight;
-    }
-
-    if ((this.vel.x > 0 && this.x > Game.canvasWidth + 20) ||
-        (this.vel.x < 0 && this.x < -20)) {
-      // why did the alien cross the road?
-      this.visible = false;
-      this.newPosition();
+    draw() {
+      ctx.save();
+      ctx.strokeStyle = '#eafff8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(this.x - 2, this.y - 2);
+      ctx.lineTo(this.x + 2, this.y + 2);
+      ctx.moveTo(this.x + 2, this.y - 2);
+      ctx.lineTo(this.x - 2, this.y + 2);
+      ctx.stroke();
+      ctx.restore();
     }
   }
-};
-BigAlien.prototype = new Sprite();
-BigAlien.prototype.color = 'red';
 
-Bullet = function () {
-  this.init("bullet", [0, 0]);
-  this.time = 0;
-  this.bridgesH = false;
-  this.bridgesV = false;
-  this.postMove = this.wrapPostMove;
-  // asteroid can look for bullets so doesn't have
-  // to be other way around
-  //this.collidesWith = ["asteroid"];
+  class Asteroid {
+    constructor(x, y, size, vx, vy, rot, rotSpd) {
+      this.x = x;
+      this.y = y;
+      this.size = size; // 3,2,1
+      this.vx = vx;
+      this.vy = vy;
+      this.rot = rot;
+      this.rotSpd = rotSpd;
+      this.shape = makeAsteroidShape(10);
+      this.dead = false;
 
-  this.configureTransform = function () {};
-  this.draw = function () {
-    if (this.visible) {
-      this.context.save();
-      this.context.lineWidth = 2;
-      this.context.strokeStyle = this.color;
-      this.context.beginPath();
-      this.context.moveTo(this.x-1, this.y-1);
-      this.context.lineTo(this.x+1, this.y+1);
-      this.context.moveTo(this.x+1, this.y-1);
-      this.context.lineTo(this.x-1, this.y+1);
-      this.context.stroke();
-      this.context.restore();
+      // Radius scaled per size
+      this.r = (size === 3 ? 42 : size === 2 ? 26 : 16);
     }
-  };
-  this.preMove = function (delta) {
-    if (this.visible) {
-      this.time += delta;
+
+    update(dt) {
+      this.x = wrap(this.x + this.vx * dt, W);
+      this.y = wrap(this.y + this.vy * dt, H);
+      this.rot += this.rotSpd * dt;
     }
-    if (this.time > 50) {
-      this.visible = false;
-      this.time = 0;
+
+    draw() {
+      strokePolygon(this.shape, this.x, this.y, this.rot, this.r, '#3cd2a5', 2);
     }
-  };
-  this.collision = function (other) {
-    this.time = 0;
-    this.visible = false;
-    this.currentNode.leave(this);
-    this.currentNode = null;
-  };
-  this.transformedPoints = function (other) {
-    return [this.x, this.y];
-  };
-
-};
-Bullet.prototype = new Sprite();
-Bullet.prototype.color = 'white';
-
-AlienBullet = function () {
-  this.init("alienbullet");
-
-  this.draw = function () {
-    if (this.visible) {
-      this.context.save();
-      this.context.lineWidth = 2;
-      this.context.strokeStyle = this.color;
-      this.context.beginPath();
-      this.context.moveTo(this.x, this.y);
-      this.context.lineTo(this.x-this.vel.x, this.y-this.vel.y);
-      this.context.stroke();
-      this.context.restore();
-    }
-  };
-};
-AlienBullet.prototype = new Bullet();
-AlienBullet.prototype.color = 'red';
-
-Asteroid = function () {
-  this.init("asteroid",
-            [-10,   0,
-              -5,   7,
-              -3,   4,
-               1,  10,
-               5,   4,
-              10,   0,
-               5,  -6,
-               2, -10,
-              -4, -10,
-              -4,  -5]);
-
-  this.visible = true;
-  this.scale = 6;
-  this.postMove = this.wrapPostMove;
-
-  this.collidesWith = ["ship", "bullet", "bigalien", "alienbullet"];
-
-  this.collision = function (other) {
-    SFX.explosion();
-    if (other.name == "bullet") Game.score += 120 / this.scale;
-    this.scale /= 3;
-    if (this.scale > 0.5) {
-      // break into fragments
-      for (var i = 0; i < 3; i++) {
-        var roid = $.extend(true, {}, this);
-        roid.vel.x = Math.random() * 6 - 3;
-        roid.vel.y = Math.random() * 6 - 3;
-        if (Math.random() > 0.5) {
-          roid.points.reverse();
-        }
-        roid.vel.rot = Math.random() * 2 - 1;
-        roid.move(roid.scale * 3); // give them a little push
-        Game.sprites.push(roid);
-      }
-    }
-    Game.explosionAt(other.x, other.y);
-    this.die();
-  };
-};
-Asteroid.prototype = new Sprite();
-Asteroid.prototype.color = 'red';
-
-Explosion = function () {
-  this.init("explosion");
-
-  this.bridgesH = false;
-  this.bridgesV = false;
-
-  this.lines = [];
-  for (var i = 0; i < 5; i++) {
-    var rad = 2 * Math.PI * Math.random();
-    var x = Math.cos(rad);
-    var y = Math.sin(rad);
-    this.lines.push([x, y, x*2, y*2]);
   }
 
-  this.draw = function () {
-    if (this.visible) {
-      this.context.save();
-      this.context.lineWidth = 1.0 / this.scale;
-      this.context.beginPath();
-      for (var i = 0; i < 5; i++) {
-        var line = this.lines[i];
-        this.context.moveTo(line[0], line[1]);
-        this.context.lineTo(line[2], line[3]);
-      }
-      this.context.stroke();
-      this.context.restore();
+  class Ship {
+    constructor() {
+      this.reset();
     }
-  };
 
-  this.preMove = function (delta) {
-    if (this.visible) {
-      this.scale += delta;
+    reset() {
+      this.x = W / 2;
+      this.y = H / 2;
+      this.vx = 0;
+      this.vy = 0;
+      this.rot = -Math.PI / 2;
+      this.r = 10;
+      this.invuln = 0;
+      this.cooldown = 0;
+      this.alive = true;
     }
-    if (this.scale > 8) {
-      this.die();
-    }
-  };
-};
-Explosion.prototype = new Sprite();
 
-GridNode = function () {
-  this.north = null;
-  this.south = null;
-  this.east  = null;
-  this.west  = null;
+    update(dt) {
+      if (!this.alive) return;
 
-  this.nextSprite = null;
+      const rotSpeed = 4.2;
+      const thrust = 240;
+      const drag = 0.985;
+      const maxSpeed = 420;
 
-  this.dupe = {
-    horizontal: null,
-    vertical:   null
-  };
+      if (keyDown('ArrowLeft')) this.rot -= rotSpeed * dt;
+      if (keyDown('ArrowRight')) this.rot += rotSpeed * dt;
 
-  this.enter = function (sprite) {
-    sprite.nextSprite = this.nextSprite;
-    this.nextSprite = sprite;
-  };
-
-  this.leave = function (sprite) {
-    var ref = this;
-    while (ref && (ref.nextSprite != sprite)) {
-      ref = ref.nextSprite;
-    }
-    if (ref) {
-      ref.nextSprite = sprite.nextSprite;
-      sprite.nextSprite = null;
-    }
-  };
-
-  this.eachSprite = function(sprite, callback) {
-    var ref = this;
-    while (ref.nextSprite) {
-      ref = ref.nextSprite;
-      callback.call(sprite, ref);
-    }
-  };
-
-  this.isEmpty = function (collidables) {
-    var empty = true;
-    var ref = this;
-    while (ref.nextSprite) {
-      ref = ref.nextSprite;
-      empty = !ref.visible || collidables.indexOf(ref.name) == -1
-      if (!empty) break;
-    }
-    return empty;
-  };
-};
-
-// borrowed from typeface-0.14.js
-// http://typeface.neocracy.org
-Text = {
-  renderGlyph: function (ctx, face, char) {
-
-    var glyph = face.glyphs[char];
-
-    if (glyph.o) {
-
-      var outline;
-      if (glyph.cached_outline) {
-        outline = glyph.cached_outline;
-      } else {
-        outline = glyph.o.split(' ');
-        glyph.cached_outline = outline;
+      if (keyDown('ArrowUp')) {
+        const v = shipForwardVec(this.rot);
+        this.vx += v.x * thrust * dt;
+        this.vy += v.y * thrust * dt;
       }
 
-      var outlineLength = outline.length;
-      for (var i = 0; i < outlineLength; ) {
+      const spd = vecLen(this.vx, this.vy);
+      if (spd > maxSpeed) {
+        const k = maxSpeed / spd;
+        this.vx *= k;
+        this.vy *= k;
+      }
 
-        var action = outline[i++];
+      this.vx *= Math.pow(drag, dt * 60);
+      this.vy *= Math.pow(drag, dt * 60);
 
-        switch(action) {
-          case 'm':
-            ctx.moveTo(outline[i++], outline[i++]);
-            break;
-          case 'l':
-            ctx.lineTo(outline[i++], outline[i++]);
-            break;
+      this.x = wrap(this.x + this.vx * dt, W);
+      this.y = wrap(this.y + this.vy * dt, H);
 
-          case 'q':
-            var cpx = outline[i++];
-            var cpy = outline[i++];
-            ctx.quadraticCurveTo(outline[i++], outline[i++], cpx, cpy);
-            break;
+      if (this.invuln > 0) this.invuln -= dt;
+      if (this.cooldown > 0) this.cooldown -= dt;
+    }
 
-          case 'b':
-            var x = outline[i++];
-            var y = outline[i++];
-            ctx.bezierCurveTo(outline[i++], outline[i++], outline[i++], outline[i++], x, y);
-            break;
-        }
+    canShoot() {
+      return this.alive && this.cooldown <= 0;
+    }
+
+    shoot() {
+      this.cooldown = 0.18;
+      const v = shipForwardVec(this.rot);
+      const tip = SHIP_SHAPE[0];
+      const cos = Math.cos(this.rot);
+      const sin = Math.sin(this.rot);
+      const muzzleX = this.x + (tip.x * cos - tip.y * sin);
+      const muzzleY = this.y + (tip.x * sin + tip.y * cos);
+      const bulletSpeed = 560;
+      return new Bullet(
+        muzzleX,
+        muzzleY,
+        this.vx + v.x * bulletSpeed,
+        this.vy + v.y * bulletSpeed
+      );
+    }
+
+    draw() {
+      if (!this.alive) return;
+      const blink = this.invuln > 0 && Math.floor(this.invuln * 12) % 2 === 0;
+      if (blink) return;
+
+      strokePolygon(SHIP_SHAPE, this.x, this.y, this.rot, 1, '#eafff8', 2);
+
+      if (keyDown('ArrowUp')) {
+        const fwd = shipForwardVec(this.rot);
+        const backX = this.x - fwd.x * 10;
+        const backY = this.y - fwd.y * 10;
+        const px = -fwd.y;
+        const py = fwd.x;
+        const flameTipX = backX - fwd.x * (12 + rand(0, 6));
+        const flameTipY = backY - fwd.y * (12 + rand(0, 6));
+
+        ctx.save();
+        ctx.strokeStyle = '#3cd2a5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(backX + px * 6, backY + py * 6);
+        ctx.lineTo(flameTipX, flameTipY);
+        ctx.lineTo(backX - px * 6, backY - py * 6);
+        ctx.stroke();
+        ctx.restore();
       }
     }
-    if (glyph.ha) {
-      ctx.translate(glyph.ha, 0);
-    }
-  },
+  }
 
-  renderText: function(text, size, x, y) {
-    this.context.save();
+  const state = {
+    running: false,
+    gameOver: false,
+    score: 0,
+    lives: 3,
+    level: 1,
+    ship: new Ship(),
+    bullets: [],
+    asteroids: [],
+    lastShotPressed: false,
+  };
 
-    this.context.translate(x, y);
+  function updateHUD() {
+    if (scoreEl) scoreEl.textContent = String(state.score);
+    if (livesEl) livesEl.textContent = String(state.lives);
+  }
 
-    var pixels = size * 72 / (this.face.resolution * 100);
-    this.context.scale(pixels, -1 * pixels);
-    this.context.beginPath();
-    var chars = text.split('');
-    var charsLength = chars.length;
-    for (var i = 0; i < charsLength; i++) {
-      this.renderGlyph(this.context, this.face, chars[i]);
-    }
-    this.context.fill();
-
-    this.context.restore();
-  },
-
-  context: null,
-  face: null
-};
-
-SFX = {
-  laser:     new Audio('39459__THE_bizniss__laser.wav'),
-  explosion: new Audio('51467__smcameron__missile_explosion.wav'),
-  muted: true
-};
-
-// preload audio
-for (var sfx in SFX) {
-  if (sfx === 'muted') continue;
-  (function (key) {
-    var audio = SFX[key];
-    audio.muted = true;
-    // Try to preload but don't block on failure
+  function submitScore() {
     try {
-      var playPromise = audio.play();
-      if (playPromise && playPromise.catch) {
-        playPromise.catch(function() {
-          // Autoplay blocked - this is normal
-        });
+      if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
+        window.helixAuth.submitScore('asteroids', state.score);
       }
-    } catch (e) {
-      // Ignore preload errors
+    } catch {
+      // ignore
+    }
+  }
+
+  function spawnAsteroids(count) {
+    for (let i = 0; i < count; i++) {
+      // Spawn away from center a bit
+      let x = rand(0, W);
+      let y = rand(0, H);
+      const safeR2 = 140 * 140;
+      for (let tries = 0; tries < 50 && dist2(x, y, W / 2, H / 2) < safeR2; tries++) {
+        x = rand(0, W);
+        y = rand(0, H);
+      }
+
+      const speed = rand(40, 110) + state.level * 6;
+      const a = rand(0, TAU);
+      const vx = Math.cos(a) * speed;
+      const vy = Math.sin(a) * speed;
+      state.asteroids.push(
+        new Asteroid(x, y, 3, vx, vy, rand(0, TAU), rand(-1.4, 1.4))
+      );
+    }
+  }
+
+  function startGame() {
+    state.running = true;
+    state.gameOver = false;
+    state.score = 0;
+    state.lives = 3;
+    state.level = 1;
+    state.ship.reset();
+    state.ship.invuln = 2.0;
+    state.bullets = [];
+    state.asteroids = [];
+    spawnAsteroids(4);
+    updateHUD();
+  }
+
+  function nextLevel() {
+    state.level++;
+    spawnAsteroids(clamp(3 + state.level, 4, 12));
+    state.ship.invuln = 2.0;
+  }
+
+  function killShip() {
+    if (state.ship.invuln > 0) return;
+
+    state.lives--;
+    updateHUD();
+
+    if (state.lives < 0) {
+      state.gameOver = true;
+      state.running = false;
+      submitScore();
+      return;
     }
 
-    SFX[key] = function () {
-      if (!SFX.muted) {
-        try {
-          if (audio.duration == 0) {
-            // somehow dropped out
-            audio.load();
-            audio.play().catch(function() {});
-          } else {
-            audio.muted = false;
-            audio.currentTime = 0;
-            audio.play().catch(function() {});
-          }
-        } catch (e) {
-          // Ignore audio errors
-        }
-      }
-      return audio;
+    state.ship.reset();
+    state.ship.invuln = 2.0;
+  }
+
+  function splitAsteroid(a) {
+    a.dead = true;
+
+    state.score += (a.size === 3 ? 20 : a.size === 2 ? 50 : 100);
+    updateHUD();
+
+    if (a.size <= 1) return;
+
+    const newSize = a.size - 1;
+    for (let i = 0; i < 2; i++) {
+      const speed = rand(80, 160) + state.level * 6;
+      const ang = rand(0, TAU);
+      state.asteroids.push(
+        new Asteroid(
+          a.x,
+          a.y,
+          newSize,
+          Math.cos(ang) * speed,
+          Math.sin(ang) * speed,
+          rand(0, TAU),
+          rand(-2.0, 2.0)
+        )
+      );
     }
-  })(sfx);
-}
+  }
 
-Game = {
-  score: 0,
-  totalAsteroids: 5,
-  lives: 0,
+  function handleShooting(dt) {
+    const shotPressed = keyDown('Space');
+    const justPressed = shotPressed && !state.lastShotPressed;
+    state.lastShotPressed = shotPressed;
 
-  canvasWidth: 800,
-  canvasHeight: 600,
+    if (!state.running) return;
+    if (paused) return;
 
-  sprites: [],
-  ship: null,
-  bigAlien: null,
-
-  nextBigAlienTime: null,
-
-
-  spawnAsteroids: function (count) {
-    if (!count) count = this.totalAsteroids;
-    for (var i = 0; i < count; i++) {
-      var roid = new Asteroid();
-      roid.x = Math.random() * this.canvasWidth;
-      roid.y = Math.random() * this.canvasHeight;
-      while (!roid.isClear()) {
-        roid.x = Math.random() * this.canvasWidth;
-        roid.y = Math.random() * this.canvasHeight;
-      }
-      roid.vel.x = Math.random() * 4 - 2;
-      roid.vel.y = Math.random() * 4 - 2;
-      if (Math.random() > 0.5) {
-        roid.points.reverse();
-      }
-      roid.vel.rot = Math.random() * 2 - 1;
-      Game.sprites.push(roid);
+    if (justPressed && state.ship.canShoot()) {
+      state.bullets.push(state.ship.shoot());
     }
-  },
+  }
 
-  explosionAt: function (x, y) {
-    var splosion = new Explosion();
-    splosion.x = x;
-    splosion.y = y;
-    splosion.visible = true;
-    Game.sprites.push(splosion);
-  },
+  function update(dt) {
+    if (!state.running) return;
 
-  FSM: {
-    boot: function () {
-      Game.spawnAsteroids(5);
-      this.state = 'waiting';
-    },
-    waiting: function () {
-      Text.renderText(window.ipad ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth/2 - 270, Game.canvasHeight/2);
-      if (KEY_STATUS.space || window.gameStart) {
-        KEY_STATUS.space = false; // hack so we don't shoot right away
-        window.gameStart = false;
-        this.state = 'start';
-      }
-    },
-    start: function () {
-      for (var i = 0; i < Game.sprites.length; i++) {
-        if (Game.sprites[i].name == 'asteroid') {
-          Game.sprites[i].die();
-        } else if (Game.sprites[i].name == 'bullet' ||
-                   Game.sprites[i].name == 'bigalien') {
-          Game.sprites[i].visible = false;
-        }
-      }
+    state.ship.update(dt);
 
-      Game.score = 0;
-      Game.lives = 2;
-      Game.totalAsteroids = 2;
-      Game.spawnAsteroids();
+    for (const b of state.bullets) b.update(dt);
+    for (const a of state.asteroids) a.update(dt);
 
-      Game.nextBigAlienTime = Date.now() + 30000 + (30000 * Math.random());
-
-      this.state = 'spawn_ship';
-    },
-    spawn_ship: function () {
-      Game.ship.x = Game.canvasWidth / 2;
-      Game.ship.y = Game.canvasHeight / 2;
-      if (Game.ship.isClear()) {
-        Game.ship.rot = 0;
-        Game.ship.vel.x = 0;
-        Game.ship.vel.y = 0;
-        Game.ship.visible = true;
-        this.state = 'run';
-      }
-    },
-    run: function () {
-      for (var i = 0; i < Game.sprites.length; i++) {
-        if (Game.sprites[i].name == 'asteroid') {
+    // Bullet vs asteroid
+    for (const b of state.bullets) {
+      if (b.dead) continue;
+      for (const a of state.asteroids) {
+        if (a.dead) continue;
+        const rr = (a.r + b.r);
+        if (dist2(b.x, b.y, a.x, a.y) <= rr * rr) {
+          b.dead = true;
+          splitAsteroid(a);
           break;
         }
       }
-      if (i == Game.sprites.length) {
-        this.state = 'new_level';
-      }
-      if (!Game.bigAlien.visible &&
-          Date.now() > Game.nextBigAlienTime) {
-        Game.bigAlien.visible = true;
-        Game.nextBigAlienTime = Date.now() + (30000 * Math.random());
-      }
-    },
-    new_level: function () {
-      if (this.timer == null) {
-        this.timer = Date.now();
-      }
-      // wait a second before spawning more asteroids
-      if (Date.now() - this.timer > 1000) {
-        this.timer = null;
-        Game.totalAsteroids++;
-        if (Game.totalAsteroids > 12) Game.totalAsteroids = 12;
-        Game.spawnAsteroids();
-        this.state = 'run';
-      }
-    },
-    player_died: function () {
-      if (Game.lives < 0) {
-        this.state = 'end_game';
-        Game.submitScore();
-      } else {
-        if (this.timer == null) {
-          this.timer = Date.now();
-        }
-        // wait a second before spawning
-        if (Date.now() - this.timer > 1000) {
-          this.timer = null;
-          this.state = 'spawn_ship';
+    }
+
+    // Ship vs asteroid
+    if (state.ship.alive) {
+      for (const a of state.asteroids) {
+        if (a.dead) continue;
+        const rr = (a.r + state.ship.r);
+        if (dist2(state.ship.x, state.ship.y, a.x, a.y) <= rr * rr) {
+          killShip();
+          break;
         }
       }
-    },
-    end_game: function () {
-      Text.renderText('GAME OVER', 50, Game.canvasWidth/2 - 160, Game.canvasHeight/2 + 10);
-      if (this.timer == null) {
-        this.timer = Date.now();
-      }
-      // wait 5 seconds then go back to waiting state
-      if (Date.now() - this.timer > 5000) {
-        this.timer = null;
-        this.state = 'waiting';
-      }
+    }
 
-      window.gameStart = false;
-    },
+    // Cleanup
+    state.bullets = state.bullets.filter((b) => !b.dead);
+    state.asteroids = state.asteroids.filter((a) => !a.dead);
 
-    execute: function () {
-      this[this.state]();
-    },
-    state: 'boot'
-  },
-  
-  submitScore: function () {
-    // Check if auth system is available and user is logged in
-    if (typeof window.helixAuth !== 'undefined' && window.helixAuth.isLoggedIn()) {
-      const result = window.helixAuth.submitScore('asteroids', this.score);
-      
-      if (result.success && result.isPersonalBest) {
-        // Show personal best notification
-        setTimeout(() => {
-          console.log('🎉 New Personal Best!', this.score);
-        }, 100);
-      }
+    if (state.asteroids.length === 0) nextLevel();
+  }
+
+  function drawBackground() {
+    ctx.fillStyle = '#07120f';
+    ctx.fillRect(0, 0, W, H);
+
+    // subtle stars
+    ctx.save();
+    ctx.fillStyle = 'rgba(234, 255, 248, 0.14)';
+    for (let i = 0; i < 40; i++) {
+      const x = (i * 173) % W;
+      const y = (i * 97) % H;
+      ctx.fillRect(x, y, 1, 1);
+    }
+    ctx.restore();
+  }
+
+  function draw() {
+    drawBackground();
+
+    for (const a of state.asteroids) a.draw();
+    for (const b of state.bullets) b.draw();
+    state.ship.draw();
+
+    if (!state.running && !state.gameOver) {
+      drawText('Press SPACE to start', W / 2, H / 2 - 10, 26);
+      drawText('Arrow keys to move, P to pause', W / 2, H / 2 + 24, 16);
+    }
+
+    if (paused && state.running) {
+      drawText('PAUSED', W / 2, 90, 44);
+    }
+
+    if (state.gameOver) {
+      drawText('GAME OVER', W / 2, H / 2 - 20, 52);
+      drawText('Press SPACE to play again', W / 2, H / 2 + 26, 18);
     }
   }
 
-};
+  let lastTs = performance.now();
+  function loop(ts) {
+    const dt = clamp((ts - lastTs) / 1000, 0, 0.05);
+    lastTs = ts;
 
-
-$(function () {
-  var canvas = $("#canvas");
-  Game.canvasWidth  = canvas.width();
-  Game.canvasHeight = canvas.height();
-
-  var context = canvas[0].getContext("2d");
-
-  Text.context = context;
-  Text.face = vector_battle;
-
-  var gridWidth = Math.round(Game.canvasWidth / GRID_SIZE);
-  var gridHeight = Math.round(Game.canvasHeight / GRID_SIZE);
-  var grid = new Array(gridWidth);
-  for (var i = 0; i < gridWidth; i++) {
-    grid[i] = new Array(gridHeight);
-    for (var j = 0; j < gridHeight; j++) {
-      grid[i][j] = new GridNode();
-    }
-  }
-
-  // set up the positional references
-  for (var i = 0; i < gridWidth; i++) {
-    for (var j = 0; j < gridHeight; j++) {
-      var node   = grid[i][j];
-      node.north = grid[i][(j == 0) ? gridHeight-1 : j-1];
-      node.south = grid[i][(j == gridHeight-1) ? 0 : j+1];
-      node.west  = grid[(i == 0) ? gridWidth-1 : i-1][j];
-      node.east  = grid[(i == gridWidth-1) ? 0 : i+1][j];
-    }
-  }
-
-  // set up borders
-  for (var i = 0; i < gridWidth; i++) {
-    grid[i][0].dupe.vertical            =  Game.canvasHeight;
-    grid[i][gridHeight-1].dupe.vertical = -Game.canvasHeight;
-  }
-
-  for (var j = 0; j < gridHeight; j++) {
-    grid[0][j].dupe.horizontal           =  Game.canvasWidth;
-    grid[gridWidth-1][j].dupe.horizontal = -Game.canvasWidth;
-  }
-
-  var sprites = [];
-  Game.sprites = sprites;
-
-  // so all the sprites can use it
-  Sprite.prototype.context = context;
-  Sprite.prototype.grid    = grid;
-  Sprite.prototype.matrix  = new Matrix(2, 3);
-
-  var ship = new Ship();
-
-  ship.x = Game.canvasWidth / 2;
-  ship.y = Game.canvasHeight / 2;
-
-  sprites.push(ship);
-
-  ship.bullets = [];
-  for (var i = 0; i < 10; i++) {
-    var bull = new Bullet();
-    ship.bullets.push(bull);
-    sprites.push(bull);
-  }
-  Game.ship = ship;
-
-  var bigAlien = new BigAlien();
-  bigAlien.setup();
-  sprites.push(bigAlien);
-  Game.bigAlien = bigAlien;
-
-  var extraDude = new Ship();
-  extraDude.scale = 0.6;
-  extraDude.visible = true;
-  extraDude.preMove = null;
-  extraDude.children = [];
-
-  var i, j = 0;
-
-  var paused = false;
-  var showFramerate = false;
-  var avgFramerate = 0;
-  var frameCount = 0;
-  var elapsedCounter = 0;
-
-  var lastFrame = Date.now();
-  var thisFrame;
-  var elapsed;
-  var delta;
-
-  var canvasNode = canvas[0];
-
-  // shim layer with setTimeout fallback
-  // from here:
-  // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-  window.requestAnimFrame = (function () {
-    return  window.requestAnimationFrame       ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame    ||
-            window.oRequestAnimationFrame      ||
-            window.msRequestAnimationFrame     ||
-            function (/* function */ callback, /* DOMElement */ element) {
-              window.setTimeout(callback, 1000 / 60);
-            };
-  })();
-
-  var mainLoop = function () {
-    context.clearRect(0, 0, Game.canvasWidth, Game.canvasHeight);
-
-    Game.FSM.execute();
-
-    if (KEY_STATUS.g) {
-      context.beginPath();
-      for (var i = 0; i < gridWidth; i++) {
-        context.moveTo(i * GRID_SIZE, 0);
-        context.lineTo(i * GRID_SIZE, Game.canvasHeight);
-      }
-      for (var j = 0; j < gridHeight; j++) {
-        context.moveTo(0, j * GRID_SIZE);
-        context.lineTo(Game.canvasWidth, j * GRID_SIZE);
-      }
-      context.closePath();
-      context.stroke();
-    }
-
-    thisFrame = Date.now();
-    elapsed = thisFrame - lastFrame;
-    lastFrame = thisFrame;
-    delta = elapsed / 30;
-
-    for (i = 0; i < sprites.length; i++) {
-
-      sprites[i].run(delta);
-
-      if (sprites[i].reap) {
-        sprites[i].reap = false;
-        sprites.splice(i, 1);
-        i--;
+    // Start / restart
+    const spacePressed = keyDown('Space');
+    if (spacePressed && !state.lastShotPressed) {
+      if (!state.running && !state.gameOver) {
+        startGame();
+      } else if (state.gameOver) {
+        state.gameOver = false;
+        startGame();
       }
     }
 
-    // score
-    var score_text = ''+Game.score;
-    Text.renderText(score_text, 18, Game.canvasWidth - 14 * score_text.length, 20);
+    handleShooting(dt);
 
-    // extra dudes
-    for (i = 0; i < Game.lives; i++) {
-      context.save();
-      extraDude.x = Game.canvasWidth - (8 * (i + 1));
-      extraDude.y = 32;
-      extraDude.configureTransform();
-      extraDude.draw();
-      context.restore();
-    }
+    if (!paused) update(dt);
+    draw();
 
-    if (showFramerate) {
-      Text.renderText(''+avgFramerate, 24, Game.canvasWidth - 38, Game.canvasHeight - 2);
-    }
+    requestAnimationFrame(loop);
+  }
 
-    frameCount++;
-    elapsedCounter += elapsed;
-    if (elapsedCounter > 1000) {
-      elapsedCounter -= 1000;
-      avgFramerate = frameCount;
-      frameCount = 0;
-    }
-
-    if (paused) {
-      Text.renderText('PAUSED', 72, Game.canvasWidth/2 - 160, 120);
-    } else {
-      requestAnimFrame(mainLoop, canvasNode);
-    }
-  };
-
-  mainLoop();
-
-  $(window).keydown(function (e) {
-    switch (KEY_CODES[e.keyCode]) {
-      case 'f': // show framerate
-        showFramerate = !showFramerate;
-        break;
-      case 'p': // pause
-        paused = !paused;
-        if (!paused) {
-          // start up again
-          lastFrame = Date.now();
-          mainLoop();
-        }
-        break;
-      case 'm': // mute
-        SFX.muted = !SFX.muted;
-        break;
-    }
-  });
-});
-
-// vim: fdl=0
+  updateHUD();
+  requestAnimationFrame(loop);
+})();
