@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Pongr | Helix Games</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+	<meta content="Pongr - A classic breakout-style game with power-ups" name="description" />
+	
+	<!-- Favicon -->
+	<link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+	
+	<!-- CSS -->
+	<link href="../assets/css/vendor.min.css" rel="stylesheet" />
+	<link href="../assets/css/app.min.css" rel="stylesheet" />
+	<link href="helix-theme.css" rel="stylesheet" />
+	<link href="../auth/auth-ui.css" rel="stylesheet" />
+</head>
+<body>
+	<div id="app" class="app">
+		<div id="header" class="app-header">
+			<div class="desktop-toggler">
+				<button type="button" class="menu-toggler" data-toggle-class="app-sidebar-collapsed" data-toggle-target=".app">
+					<span class="bar"></span>
+					<span class="bar"></span>
+					<span class="bar"></span>
+				</button>
+			</div>
+			
+			<div class="brand">
+				<a href="../" class="brand-logo">
+					<span class="brand-img">
+						<span class="brand-img-text text-theme">H</span>
+					</span>
+					<span class="brand-text">Helix Games</span>
+				</a>
+			</div>
+			
+			<div class="menu">
+				<div class="menu-item dropdown">
+					<a href="#" data-toggle-class="open" data-toggle-target=".dropdown" class="menu-link">
+						<div class="menu-text">Games</div>
+						<span class="caret ms-1"></span>
+					</a>
+					<div class="dropdown-menu">
+						<a href="../2048/" class="dropdown-item">🎯 2048</a>
+						<a href="../asteroids/" class="dropdown-item">🚀 Asteroids</a>
+						<a href="../invasion/" class="dropdown-item">👾 Alien Invasion</a>
+						<a href="../lode-runner/" class="dropdown-item">🏃 Lode Runner</a>
+						<a href="../pacman/" class="dropdown-item">🟡 Pac-Man</a>
+						<a href="../planet-patrol/" class="dropdown-item">🚗 Planet Patrol</a>
+						<a href="../pongr/" class="dropdown-item active">🏓 Pongr</a>
+						<a href="../space-invaders/" class="dropdown-item">🛸 Space Invaders</a>
+						<a href="../tetris/" class="dropdown-item">🧩 Tetris</a>
+					</div>
+				</div>
+				<div class="menu-item">
+					<a href="../leaderboards.html" class="menu-link">
+						<span class="menu-text">Leaderboards</span>
+					</a>
+				</div>
+			</div>
+			
+			<div class="menu-item" id="auth-container">
+				<!-- Auth UI will be injected here -->
+			</div>
+		</div>
+		
+		<div class="game-container">
+			<div class="game-header">
+				<h1 class="game-title">PONGR</h1>
+				<div class="game-stats">
+					<div class="stat">
+						<span class="stat-label">Score</span>
+						<span class="stat-value" id="score">0</span>
+					</div>
+					<div class="stat">
+						<span class="stat-label">Level</span>
+						<span class="stat-value" id="level">1</span>
+					</div>
+					<div class="stat">
+						<span class="stat-label">Lives</span>
+						<span class="stat-value" id="lives">3</span>
+					</div>
+				</div>
+			</div>
+			
+			<div class="game-wrapper">
+				<canvas id="game-canvas"></canvas>
+			</div>
+			
+			<div class="game-controls">
+				<div class="control-group">
+					<button class="control-btn" id="btn-left">◀</button>
+					<button class="control-btn" id="btn-right">▶</button>
+				</div>
+				<div class="control-group">
+					<button class="control-btn" id="btn-launch">LAUNCH</button>
+				</div>
+			</div>
+			
+			<div class="game-info">
+				<h3>How to Play</h3>
+				<ul>
+					<li><strong>← →</strong> or <strong>A/D</strong> - Move paddle</li>
+					<li><strong>SPACE</strong> - Launch ball / Pause</li>
+					<li><strong>Mouse</strong> - Move paddle (click to launch)</li>
+					<li>Break all bricks to advance</li>
+					<li>Catch power-ups for bonuses!</li>
+				</ul>
+				<h4>Power-Ups</h4>
+				<ul class="powerup-list">
+					<li><span class="powerup-icon expand">⬌</span> Expand paddle</li>
+					<li><span class="powerup-icon shrink">⬄</span> Shrink paddle</li>
+					<li><span class="powerup-icon multi">✦</span> Multi-ball</li>
+					<li><span class="powerup-icon slow">▼</span> Slow ball</li>
+					<li><span class="powerup-icon fast">▲</span> Fast ball</li>
+					<li><span class="powerup-icon life">♥</span> Extra life</li>
+					<li><span class="powerup-icon laser">⚡</span> Laser paddle</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<!-- JS -->
+	<script src="../assets/js/vendor.min.js"></script>
+	<script src="../assets/js/app.min.js"></script>
+	<script src="../auth/auth.js"></script>
+	<script src="../auth/auth-ui.js"></script>
+	<script src="game.js"></script>
+</body>
+</html>
