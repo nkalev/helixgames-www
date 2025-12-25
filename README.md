@@ -19,6 +19,21 @@ Classic arcade space shooter. Navigate your spaceship through an asteroid field 
 - Arrow keys: Rotate and thrust
 - Spacebar: Fire
 
+### [Help Chopper](help-chopper/index.html)
+Choplifter-style rescue game! Fly your helicopter into enemy territory, rescue hostages from camps, and bring them safely back to base.
+
+**Controls:**
+- Arrow keys or WASD: Move helicopter
+- Spacebar or X: Fire weapons
+- P: Pause
+
+**Features:**
+- Scrolling world with multiple hostage camps
+- Land near hostages to pick them up (max 8)
+- Return hostages to base for points
+- Enemy tanks and jets to destroy
+- Minimap for navigation
+
 ### [Invasion](invasion/index.html)
 Space invaders style arcade shooter. Defend Earth from waves of alien attackers!
 

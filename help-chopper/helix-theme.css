@@ -1,0 +1,206 @@
+/* Help Chopper - Helix Games Theme */
+
+.game-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: calc(100vh - 60px);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.game-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #3cd2a5;
+    text-shadow: 0 0 20px rgba(60, 210, 165, 0.5);
+    margin: 0;
+    letter-spacing: 4px;
+}
+
+.game-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(60, 210, 165, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(60, 210, 165, 0.3);
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #3cd2a5;
+}
+
+.game-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#game-canvas {
+    background: linear-gradient(180deg, #1a1a3e 0%, #2d1a4e 50%, #1a2a1a 100%);
+    border: 3px solid #3cd2a5;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(60, 210, 165, 0.3);
+    max-width: 100%;
+}
+
+.game-controls {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.control-group {
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    background: rgba(60, 210, 165, 0.2);
+    border: 2px solid #3cd2a5;
+    color: #3cd2a5;
+    padding: 15px 20px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 55px;
+    text-align: center;
+}
+
+.control-btn:hover,
+.control-btn:active {
+    background: rgba(60, 210, 165, 0.4);
+    transform: scale(1.05);
+}
+
+.game-info {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.game-info h3 {
+    color: #3cd2a5;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.game-info h4 {
+    color: #3cd2a5;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.game-info ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #ccc;
+}
+
+.game-info li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.game-info strong {
+    color: #3cd2a5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    .game-header {
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .game-title {
+        font-size: 1.8rem;
+        width: 100%;
+    }
+    
+    .game-stats {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .stat {
+        padding: 8px 12px;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .game-controls {
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-stats {
+        gap: 8px;
+    }
+    
+    .stat {
+        padding: 6px 10px;
+    }
+    
+    .control-btn {
+        padding: 12px 15px;
+        font-size: 1rem;
+        min-width: 45px;
+    }
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes flash {
+    0%, 100% { background: rgba(60, 210, 165, 0.1); }
+    50% { background: rgba(60, 210, 165, 0.3); }
+}
+
+.stat-value.highlight {
+    animation: pulse 0.3s ease;
+}
+
+.stat.rescued-highlight {
+    animation: flash 0.5s ease;
+}
